@@ -43,6 +43,11 @@
     if (CGPointEqualToPoint(_currentPoint, CGPointZero)) return;
     
     CGContextRef context = UIGraphicsGetCurrentContext();
+    CGContextSetLineCap(context, kCGLineCapRound);
+    CGContextSetLineJoin(context, kCGLineJoinRound);
+    CGContextSetMiterLimit(context, 2.0);
+    CGContextSetLineWidth(context, 4.0);
+
     [[UIColor redColor] setStroke];
     
     if (_path == NULL) {
@@ -57,7 +62,14 @@
         }else if (_state == UIGestureRecognizerStateEnded) {
             CGPathAddLineToPoint(_path, NULL, _currentPoint.x, _currentPoint.y);
         }
-    }else if (_currentDrawingMode == UkeDrawingModeEllipse) { //! 画
+        CGContextAddPath(context, _path);
+        CGContextDrawPath(context, kCGPathStroke);
+        if (_state == UIGestureRecognizerStateEnded) {
+            [_delegate canvas:self didEndDrawing:_path];
+            CGPathRelease(_path);
+            _path = NULL;
+        }
+    }else if (_currentDrawingMode == UkeDrawingModeEllipse) { //! 画椭圆
         CGMutablePathRef ellipsePath = CGPathCreateMutable();
         CGPathAddEllipseInRect(ellipsePath, NULL, CGRectMake(_firstPoint.x, _firstPoint.y, _currentPoint.x-_firstPoint.x, _currentPoint.y-_firstPoint.y));
         CGContextAddPath(context, ellipsePath);
@@ -65,7 +77,7 @@
         if (_state == UIGestureRecognizerStateEnded) {
             [_delegate canvas:self didEndDrawing:ellipsePath];
         }
-//        CGPathRelease(ellipsePath);
+        CGPathRelease(ellipsePath);
     }
 }
 

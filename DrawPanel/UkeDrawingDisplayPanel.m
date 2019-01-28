@@ -49,13 +49,15 @@
     shapeLayer.frame = self.bounds;
     shapeLayer.fillColor = [UIColor clearColor].CGColor;
     shapeLayer.strokeColor = [UIColor redColor].CGColor;
-    shapeLayer.lineWidth = 1.0;
+    shapeLayer.lineWidth = 4.0;
     shapeLayer.path = path;
-    [_allCanvas addObject:shapeLayer];
     [self.layer addSublayer:shapeLayer];
+    
+    [_allCanvas addObject:shapeLayer];
     
     [self.canvas removeFromSuperview];
     self.canvas = nil;
+    // 重新生成一个新的画布
     [self canvas].currentDrawingMode = self.currentDrawingMode;
 }
 
