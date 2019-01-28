@@ -110,10 +110,11 @@
 - (void)setCurrentPainting:(CALayer *)currentPainting {
     NSArray *sublayers = currentPainting.sublayers;
     if (sublayers.count) {
-        [sublayers enumerateObjectsUsingBlock:^(CAShapeLayer *shapeLayer, NSUInteger idx, BOOL * _Nonnull stop) {
+        for (int i = 0; i < sublayers.count; i ++) {
+            CAShapeLayer *shapeLayer = sublayers[i];
             [self.layer addSublayer:shapeLayer];
             [self.allStrokes addObject:shapeLayer];
-        }];
+        }
     }
 }
 

@@ -47,31 +47,61 @@
 }
 
 - (void)turnToNextPage {
-    // 移除当前画布
-    [_currentCanvas removeFromSuperview];
-    _currentCanvas = nil;
+    // 获取当前画布内容
+    CALayer *currentPainting = [_currentCanvas currentPainting];
     
-    _currentIndex ++;
-    // 创建新画布
-    [self createCanvas];
-    // 恢复画布内容
-    if (_currentIndex < _allPaintings.count) {
-        CALayer *painting = _allPaintings[_currentIndex];
-        [_currentCanvas setCurrentPainting:painting];
+    // 如果当前是最后一页
+    if (_allPaintings.count==0 || _currentIndex==_allPaintings.count-1) {
+        // 存储当前画布内容
+        [_allPaintings addObject:currentPainting];
+        // 移除当前画布
+        [_currentCanvas removeFromSuperview];
+        _currentCanvas = nil;
+        
+        _currentIndex ++;
+        // 创建新画布
+        [self createCanvas];
+    }
+    // 如果当前不是最后一页
+    else {
+        // 替换存储内容
+        [_allPaintings replaceObjectAtIndex:_currentIndex withObject:currentPainting];
+        // 移除当前画布
+        [_currentCanvas removeFromSuperview];
+        _currentCanvas = nil;
+        
+        _currentIndex ++;
+        // 创建新画布
+        [self createCanvas];
+        // 恢复缓存的画布内容
+        CALayer *cachedPainting = _allPaintings[_currentIndex];
+        [_currentCanvas setCurrentPainting:cachedPainting];
     }
 }
 
 - (void)turnToPreviousPage {
+    if (_currentIndex == 0) return;
+    
+    // 获取当前画布内容
+    CALayer *currentPainting = [_currentCanvas currentPainting];
+    if (_currentIndex == _allPaintings.count) {
+        // 存储当前内容
+        [_allPaintings addObject:currentPainting];
+    }else {
+        // 替换存储内容
+        [_allPaintings replaceObjectAtIndex:_currentIndex withObject:currentPainting];
+    }
+
     // 移除当前画布
     [_currentCanvas removeFromSuperview];
     _currentCanvas = nil;
     
     _currentIndex --;
-    if (_currentIndex < 0) return;
     // 创建新画布
     [self createCanvas];
-    CALayer *painting = _allPaintings[_currentIndex];
-    [_currentCanvas setCurrentPainting:painting];
+    // 恢复缓存的画布内容
+    CALayer *cachedPainting = _allPaintings[_currentIndex];
+    [_currentCanvas setCurrentPainting:cachedPainting];
 }
 
 - (UkeDrawingCanvas *)createCanvas {
@@ -80,7 +110,6 @@
         canvas.frame = self.bounds;
         [self addSubview:canvas];
         _currentCanvas = canvas;
-        
     }
     return _currentCanvas;
 }
