@@ -11,14 +11,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class UkeDrawingCanvas;
-@protocol UkeDrawingCanvasDelegate <NSObject>
-- (void)canvas:(UkeDrawingCanvas *)canvas didEndDrawing:(CGPathRef)path;
-@end
-
 @interface UkeDrawingCanvas : UIView
 @property (nonatomic, assign) UkeDrawingMode currentDrawingMode;
-@property (nonatomic, weak) id<UkeDrawingCanvasDelegate> delegate;
 
 //! 当前画布内容
 @property (nonatomic, strong) CALayer *currentPainting;

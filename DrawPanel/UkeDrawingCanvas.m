@@ -7,18 +7,13 @@
 //
 
 #import "UkeDrawingCanvas.h"
+#import "UkePaintingLayer.h"
 
 @interface UkeDrawingCanvas ()
-//! 画笔路径
-@property (nonatomic, assign) CGMutablePathRef path;
+//! 绘画的layer
+@property (nonatomic, strong) UkePaintingLayer *paintingLayer;
 // 手势状态
 @property (nonatomic, assign) UIGestureRecognizerState state;
-//! 落笔的第一点
-@property (nonatomic, assign) CGPoint startPoint;
-//! 当前点
-@property (nonatomic, assign) CGPoint currentPoint;
-//! 所有的笔画
-@property (nonatomic, strong) NSMutableArray<CAShapeLayer *> *allStrokes;
 
 @end
 
@@ -29,115 +24,49 @@
     if (self) {
         self.backgroundColor = [UIColor clearColor];
         
-        _allStrokes = [NSMutableArray array];
         UIPanGestureRecognizer *pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePanGesture:)];
         [self addGestureRecognizer:pan];
+        
+        _paintingLayer = [[UkePaintingLayer alloc] init];
+        [self.layer addSublayer:_paintingLayer];
     }
     return self;
+}
+
+- (void)willMoveToSuperview:(UIView *)newSuperview {
+    [super willMoveToSuperview:newSuperview];
+    if (newSuperview) {
+        _paintingLayer.frame = self.frame;
+    }
 }
 
 - (void)handlePanGesture:(UIGestureRecognizer *)pan {
     CGPoint point = [pan locationInView:self];
     
     _state = pan.state;
-    _currentPoint = point;
+    
+    CGPoint startPoint = CGPointZero;
     if (_state == UIGestureRecognizerStateBegan) {
-        _startPoint = point;
+        startPoint = point;
     }
-    [self setNeedsDisplay];
+    CGPoint currentPoint = point;
+    
+    [_paintingLayer setDrawingState:[self drawingStateFromGestureState:pan.state]];
+    [_paintingLayer drawWithStartPoint:startPoint currentPoint:currentPoint];
 }
 
-- (void)drawRect:(CGRect)rect {
-    if (CGPointEqualToPoint(_currentPoint, CGPointZero)) return;
-    
-    CGContextRef context = UIGraphicsGetCurrentContext();
-    CGContextSetLineCap(context, kCGLineCapRound);
-    CGContextSetLineJoin(context, kCGLineJoinRound);
-    CGContextSetMiterLimit(context, 2.0);
-    CGContextSetLineWidth(context, 4.0);
-
-    [[UIColor redColor] setStroke];
-    
-    if (_path == NULL) {
-        _path = CGPathCreateMutable();
+- (UkeDrawingState)drawingStateFromGestureState:(UIGestureRecognizerState)state {
+    UkeDrawingState drawingState = UkeDrawingStateUnknown;
+    if (state == UIGestureRecognizerStateBegan) {
+        drawingState = UkeDrawingStateStart;
+    }else if (state == UIGestureRecognizerStateChanged) {
+        drawingState = UkeDrawingStateDrawing;
+    }else if (state == UIGestureRecognizerStateEnded ||
+              state == UIGestureRecognizerStateCancelled ||
+              state == UIGestureRecognizerStateFailed) {
+        drawingState = UkeDrawingStateEnd;
     }
-    
-    if (_currentDrawingMode == UkeDrawingModeLine) { //! 画线
-        if (_state == UIGestureRecognizerStateBegan) {
-            CGPathMoveToPoint(_path, NULL, _currentPoint.x, _currentPoint.y);
-        }else {
-            CGPathAddLineToPoint(_path, NULL, _currentPoint.x, _currentPoint.y);
-        }
-        CGContextAddPath(context, _path);
-        CGContextDrawPath(context, kCGPathStroke);
-        if (_state == UIGestureRecognizerStateEnded) {
-            [self didEndDrawingOneStroke:_path];
-            CGPathRelease(_path);
-            _path = NULL;
-        }
-    }
-    else if (_currentDrawingMode == UkeDrawingModeSegment) { //! 画线段
-        CGMutablePathRef segmentPath = CGPathCreateMutable();
-        CGPathMoveToPoint(segmentPath, NULL, _startPoint.x, _startPoint.y);
-        CGPathAddLineToPoint(segmentPath, NULL, _currentPoint.x, _currentPoint.y);
-        CGContextAddPath(context, segmentPath);
-        CGContextDrawPath(context, kCGPathStroke);
-        if (_state == UIGestureRecognizerStateEnded) {
-            [self didEndDrawingOneStroke:segmentPath];
-        }
-        CGPathRelease(segmentPath);
-    }
-    else if (_currentDrawingMode == UkeDrawingModeEllipse) { //! 画椭圆
-        CGMutablePathRef ellipsePath = CGPathCreateMutable();
-        CGPathAddEllipseInRect(ellipsePath, NULL, CGRectMake(_startPoint.x, _startPoint.y, _currentPoint.x-_startPoint.x, _currentPoint.y-_startPoint.y));
-        CGContextAddPath(context, ellipsePath);
-        CGContextDrawPath(context, kCGPathStroke);
-        if (_state == UIGestureRecognizerStateEnded) {
-            [self didEndDrawingOneStroke:ellipsePath];
-        }
-        CGPathRelease(ellipsePath);
-    }else if (_currentDrawingMode == UkeDrawingModeRectangle) { //! 画框
-        CGMutablePathRef rectanglePath = CGPathCreateMutable();
-        CGPathAddRect(rectanglePath, NULL, CGRectMake(_startPoint.x, _startPoint.y, _currentPoint.x-_startPoint.x, _currentPoint.y-_startPoint.y));
-        CGContextAddPath(context, rectanglePath);
-        CGContextDrawPath(context, kCGPathStroke);
-        if (_state == UIGestureRecognizerStateEnded) {
-            [self didEndDrawingOneStroke:rectanglePath];
-        }
-        CGPathRelease(rectanglePath);
-    }else if (_currentDrawingMode == UkeDrawingModeEraser) { //! 画橡皮擦
-        [[UIColor whiteColor] setStroke];
-        
-        if (_state == UIGestureRecognizerStateBegan) {
-            CGPathMoveToPoint(_path, NULL, _currentPoint.x, _currentPoint.y);
-        }else {
-            CGPathAddLineToPoint(_path, NULL, _currentPoint.x, _currentPoint.y);
-        }
-        CGContextAddPath(context, _path);
-        CGContextDrawPath(context, kCGPathStroke);
-        if (_state == UIGestureRecognizerStateEnded) {
-            [self didEndDrawingOneStroke:_path];
-            CGPathRelease(_path);
-            _path = NULL;
-        }
-    }
-}
-
-- (void)didEndDrawingOneStroke:(CGPathRef)path {
-    CAShapeLayer *shapeLayer = [CAShapeLayer layer];
-    shapeLayer.lineCap = @"round";
-    shapeLayer.lineJoin = @"round";
-    shapeLayer.frame = self.bounds;
-    shapeLayer.fillColor = [UIColor clearColor].CGColor;
-    shapeLayer.strokeColor = [UIColor redColor].CGColor;
-    if (_currentDrawingMode == UkeDrawingModeEraser) {
-        shapeLayer.strokeColor = [UIColor whiteColor].CGColor;
-    }
-    shapeLayer.lineWidth = 4.0;
-    shapeLayer.path = path;
-    [self.layer addSublayer:shapeLayer];
-    
-    [_allStrokes addObject:shapeLayer];
+    return drawingState;
 }
 
 - (CALayer *)currentPainting {
@@ -148,9 +77,10 @@
     NSArray *sublayers = currentPainting.sublayers.copy;
     if (sublayers.count) {
         for (int i = 0; i < sublayers.count; i++) {
-            CAShapeLayer *shapeLayer = sublayers[i];
-            [self.layer addSublayer:shapeLayer];
-            [self.allStrokes addObject:shapeLayer];
+            CALayer *layer = sublayers[i];
+//            [self.layer addSublayer:layer];
+            [self.layer insertSublayer:layer below:_paintingLayer];
+
         }
     }
 }

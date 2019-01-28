@@ -21,4 +21,11 @@ typedef NS_ENUM(NSInteger, UkeDrawingMode) {
     UkeDrawingModeTriangle, //! 三角形
 };
 
+typedef NS_ENUM(NSInteger, UkeDrawingState) {
+    UkeDrawingStateUnknown = -1,
+    UkeDrawingStateStart = 0,
+    UkeDrawingStateDrawing,
+    UkeDrawingStateEnd
+};
+
 #endif /* UkeDrawingConstants_h */

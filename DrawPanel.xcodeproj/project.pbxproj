@@ -17,6 +17,7 @@
 		54A3362B21FC11DD00B7AD5C /* DrawPanelUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 54A3362A21FC11DD00B7AD5C /* DrawPanelUITests.m */; };
 		54A3363A21FC120E00B7AD5C /* UkeDrawingDisplayPanel.m in Sources */ = {isa = PBXBuildFile; fileRef = 54A3363921FC120E00B7AD5C /* UkeDrawingDisplayPanel.m */; };
 		54A3363D21FC67DB00B7AD5C /* UkeDrawingCanvas.m in Sources */ = {isa = PBXBuildFile; fileRef = 54A3363C21FC67DB00B7AD5C /* UkeDrawingCanvas.m */; };
+		54DCDEB021FF063100B48C8B /* UkePaintingLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 54DCDEAF21FF063100B48C8B /* UkePaintingLayer.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -58,6 +59,8 @@
 		54A3363B21FC67DB00B7AD5C /* UkeDrawingCanvas.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UkeDrawingCanvas.h; sourceTree = "<group>"; };
 		54A3363C21FC67DB00B7AD5C /* UkeDrawingCanvas.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UkeDrawingCanvas.m; sourceTree = "<group>"; };
 		54A3363E21FC695800B7AD5C /* UkeDrawingConstants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UkeDrawingConstants.h; sourceTree = "<group>"; };
+		54DCDEAE21FF063100B48C8B /* UkePaintingLayer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UkePaintingLayer.h; sourceTree = "<group>"; };
+		54DCDEAF21FF063100B48C8B /* UkePaintingLayer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UkePaintingLayer.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -117,6 +120,9 @@
 				54A3363921FC120E00B7AD5C /* UkeDrawingDisplayPanel.m */,
 				54A3363B21FC67DB00B7AD5C /* UkeDrawingCanvas.h */,
 				54A3363C21FC67DB00B7AD5C /* UkeDrawingCanvas.m */,
+				54DCDEB121FF06B700B48C8B /* New Group */,
+				54DCDEAE21FF063100B48C8B /* UkePaintingLayer.h */,
+				54DCDEAF21FF063100B48C8B /* UkePaintingLayer.m */,
 				54A3360C21FC11DB00B7AD5C /* Main.storyboard */,
 				54A3360F21FC11DD00B7AD5C /* Assets.xcassets */,
 				54A3361121FC11DD00B7AD5C /* LaunchScreen.storyboard */,
@@ -142,6 +148,13 @@
 				54A3362C21FC11DD00B7AD5C /* Info.plist */,
 			);
 			path = DrawPanelUITests;
+			sourceTree = "<group>";
+		};
+		54DCDEB121FF06B700B48C8B /* New Group */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = "New Group";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -277,6 +290,7 @@
 				54A3360B21FC11DB00B7AD5C /* ViewController.m in Sources */,
 				54A3361621FC11DD00B7AD5C /* main.m in Sources */,
 				54A3363A21FC120E00B7AD5C /* UkeDrawingDisplayPanel.m in Sources */,
+				54DCDEB021FF063100B48C8B /* UkePaintingLayer.m in Sources */,
 				54A3363D21FC67DB00B7AD5C /* UkeDrawingCanvas.m in Sources */,
 				54A3360821FC11DB00B7AD5C /* AppDelegate.m in Sources */,
 			);
