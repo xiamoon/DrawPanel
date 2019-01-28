@@ -14,7 +14,7 @@
 // 手势状态
 @property (nonatomic, assign) UIGestureRecognizerState state;
 //! 落笔的第一点
-@property (nonatomic, assign) CGPoint firstPoint;
+@property (nonatomic, assign) CGPoint startPoint;
 //! 当前点
 @property (nonatomic, assign) CGPoint currentPoint;
 //! 所有的笔画
@@ -42,7 +42,7 @@
     _state = pan.state;
     _currentPoint = point;
     if (_state == UIGestureRecognizerStateBegan) {
-        _firstPoint = point;
+        _startPoint = point;
     }
     [self setNeedsDisplay];
 }
@@ -65,9 +65,7 @@
     if (_currentDrawingMode == UkeDrawingModeLine) { //! 画线
         if (_state == UIGestureRecognizerStateBegan) {
             CGPathMoveToPoint(_path, NULL, _currentPoint.x, _currentPoint.y);
-        }else if (_state == UIGestureRecognizerStateChanged) {
-            CGPathAddLineToPoint(_path, NULL, _currentPoint.x, _currentPoint.y);
-        }else if (_state == UIGestureRecognizerStateEnded) {
+        }else {
             CGPathAddLineToPoint(_path, NULL, _currentPoint.x, _currentPoint.y);
         }
         CGContextAddPath(context, _path);
@@ -77,15 +75,51 @@
             CGPathRelease(_path);
             _path = NULL;
         }
-    }else if (_currentDrawingMode == UkeDrawingModeEllipse) { //! 画椭圆
+    }
+    else if (_currentDrawingMode == UkeDrawingModeSegment) { //! 画线段
+        CGMutablePathRef segmentPath = CGPathCreateMutable();
+        CGPathMoveToPoint(segmentPath, NULL, _startPoint.x, _startPoint.y);
+        CGPathAddLineToPoint(segmentPath, NULL, _currentPoint.x, _currentPoint.y);
+        CGContextAddPath(context, segmentPath);
+        CGContextDrawPath(context, kCGPathStroke);
+        if (_state == UIGestureRecognizerStateEnded) {
+            [self didEndDrawingOneStroke:segmentPath];
+        }
+        CGPathRelease(segmentPath);
+    }
+    else if (_currentDrawingMode == UkeDrawingModeEllipse) { //! 画椭圆
         CGMutablePathRef ellipsePath = CGPathCreateMutable();
-        CGPathAddEllipseInRect(ellipsePath, NULL, CGRectMake(_firstPoint.x, _firstPoint.y, _currentPoint.x-_firstPoint.x, _currentPoint.y-_firstPoint.y));
+        CGPathAddEllipseInRect(ellipsePath, NULL, CGRectMake(_startPoint.x, _startPoint.y, _currentPoint.x-_startPoint.x, _currentPoint.y-_startPoint.y));
         CGContextAddPath(context, ellipsePath);
         CGContextDrawPath(context, kCGPathStroke);
         if (_state == UIGestureRecognizerStateEnded) {
             [self didEndDrawingOneStroke:ellipsePath];
         }
         CGPathRelease(ellipsePath);
+    }else if (_currentDrawingMode == UkeDrawingModeRectangle) { //! 画框
+        CGMutablePathRef rectanglePath = CGPathCreateMutable();
+        CGPathAddRect(rectanglePath, NULL, CGRectMake(_startPoint.x, _startPoint.y, _currentPoint.x-_startPoint.x, _currentPoint.y-_startPoint.y));
+        CGContextAddPath(context, rectanglePath);
+        CGContextDrawPath(context, kCGPathStroke);
+        if (_state == UIGestureRecognizerStateEnded) {
+            [self didEndDrawingOneStroke:rectanglePath];
+        }
+        CGPathRelease(rectanglePath);
+    }else if (_currentDrawingMode == UkeDrawingModeEraser) { //! 画橡皮擦
+        [[UIColor whiteColor] setStroke];
+        
+        if (_state == UIGestureRecognizerStateBegan) {
+            CGPathMoveToPoint(_path, NULL, _currentPoint.x, _currentPoint.y);
+        }else {
+            CGPathAddLineToPoint(_path, NULL, _currentPoint.x, _currentPoint.y);
+        }
+        CGContextAddPath(context, _path);
+        CGContextDrawPath(context, kCGPathStroke);
+        if (_state == UIGestureRecognizerStateEnded) {
+            [self didEndDrawingOneStroke:_path];
+            CGPathRelease(_path);
+            _path = NULL;
+        }
     }
 }
 
@@ -96,6 +130,9 @@
     shapeLayer.frame = self.bounds;
     shapeLayer.fillColor = [UIColor clearColor].CGColor;
     shapeLayer.strokeColor = [UIColor redColor].CGColor;
+    if (_currentDrawingMode == UkeDrawingModeEraser) {
+        shapeLayer.strokeColor = [UIColor whiteColor].CGColor;
+    }
     shapeLayer.lineWidth = 4.0;
     shapeLayer.path = path;
     [self.layer addSublayer:shapeLayer];
