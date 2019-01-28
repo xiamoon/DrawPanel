@@ -108,9 +108,9 @@
 }
 
 - (void)setCurrentPainting:(CALayer *)currentPainting {
-    NSArray *sublayers = currentPainting.sublayers;
+    NSArray *sublayers = currentPainting.sublayers.copy;
     if (sublayers.count) {
-        for (int i = 0; i < sublayers.count; i ++) {
+        for (int i = 0; i < sublayers.count; i++) {
             CAShapeLayer *shapeLayer = sublayers[i];
             [self.layer addSublayer:shapeLayer];
             [self.allStrokes addObject:shapeLayer];

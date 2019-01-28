@@ -51,9 +51,15 @@
     CALayer *currentPainting = [_currentCanvas currentPainting];
     
     // 如果当前是最后一页
-    if (_allPaintings.count==0 || _currentIndex==_allPaintings.count-1) {
-        // 存储当前画布内容
-        [_allPaintings addObject:currentPainting];
+    if (_allPaintings.count==0 || _currentIndex >= _allPaintings.count-1) {
+        if (_currentIndex == _allPaintings.count-1) {
+            // 替换存储内容
+            [_allPaintings replaceObjectAtIndex:_currentIndex withObject:currentPainting];
+        }else {
+            // 存储当前画布内容
+            [_allPaintings addObject:currentPainting];
+        }
+        
         // 移除当前画布
         [_currentCanvas removeFromSuperview];
         _currentCanvas = nil;
@@ -77,6 +83,7 @@
         CALayer *cachedPainting = _allPaintings[_currentIndex];
         [_currentCanvas setCurrentPainting:cachedPainting];
     }
+    _currentCanvas.currentDrawingMode = self.currentDrawingMode;
 }
 
 - (void)turnToPreviousPage {
@@ -84,7 +91,7 @@
     
     // 获取当前画布内容
     CALayer *currentPainting = [_currentCanvas currentPainting];
-    if (_currentIndex == _allPaintings.count) {
+    if (_currentIndex > _allPaintings.count-1) {
         // 存储当前内容
         [_allPaintings addObject:currentPainting];
     }else {
@@ -102,6 +109,7 @@
     // 恢复缓存的画布内容
     CALayer *cachedPainting = _allPaintings[_currentIndex];
     [_currentCanvas setCurrentPainting:cachedPainting];
+    _currentCanvas.currentDrawingMode = self.currentDrawingMode;
 }
 
 - (UkeDrawingCanvas *)createCanvas {
