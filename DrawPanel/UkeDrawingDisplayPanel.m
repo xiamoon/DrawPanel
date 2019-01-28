@@ -9,10 +9,13 @@
 #import "UkeDrawingDisplayPanel.h"
 #import "UkeDrawingCanvas.h"
 
-@interface UkeDrawingDisplayPanel () <UkeDrawingCanvasDelegate>
+@interface UkeDrawingDisplayPanel ()
 @property (nonatomic, assign) UkeDrawingMode currentDrawingMode;
-@property (nonatomic, strong) UkeDrawingCanvas *canvas;
-@property (nonatomic, strong) NSMutableArray *allCanvas;
+@property (nonatomic, strong) UkeDrawingCanvas *currentCanvas;
+//! 所有的绘画内容
+@property (nonatomic, strong) NSMutableArray<CALayer *> *allPaintings;
+//! 当前索引
+@property (nonatomic, assign) NSInteger currentIndex;
 @end
 
 @implementation UkeDrawingDisplayPanel
@@ -21,7 +24,8 @@
     self = [super init];
     if (self) {
         self.backgroundColor = [UIColor blackColor];
-        _allCanvas = [NSMutableArray array];
+        _allPaintings = [NSMutableArray array];
+        _currentIndex = 0;
     }
     return self;
 }
@@ -29,7 +33,8 @@
 - (void)willMoveToSuperview:(UIView *)newSuperview {
     [super willMoveToSuperview:newSuperview];
     if (newSuperview) {
-        [self canvas];
+        // 创建画布
+        [self createCanvas];
     }
 }
 
@@ -38,38 +43,46 @@
         return;
     }
     _currentDrawingMode = drawingMode;
-    self.canvas.currentDrawingMode = drawingMode;
+    _currentCanvas.currentDrawingMode = drawingMode;
 }
 
-#pragma mark - UkeDrawingCanvasDelegate
-- (void)canvas:(UkeDrawingCanvas *)canvas didEndDrawing:(CGPathRef)path {
-    CAShapeLayer *shapeLayer = [CAShapeLayer layer];
-    shapeLayer.lineCap = @"round";
-    shapeLayer.lineJoin = @"round";
-    shapeLayer.frame = self.bounds;
-    shapeLayer.fillColor = [UIColor clearColor].CGColor;
-    shapeLayer.strokeColor = [UIColor redColor].CGColor;
-    shapeLayer.lineWidth = 4.0;
-    shapeLayer.path = path;
-    [self.layer addSublayer:shapeLayer];
+- (void)turnToNextPage {
+    // 移除当前画布
+    [_currentCanvas removeFromSuperview];
+    _currentCanvas = nil;
     
-    [_allCanvas addObject:shapeLayer];
-    
-    [self.canvas removeFromSuperview];
-    self.canvas = nil;
-    // 重新生成一个新的画布
-    [self canvas].currentDrawingMode = self.currentDrawingMode;
+    _currentIndex ++;
+    // 创建新画布
+    [self createCanvas];
+    // 恢复画布内容
+    if (_currentIndex < _allPaintings.count) {
+        CALayer *painting = _allPaintings[_currentIndex];
+        [_currentCanvas setCurrentPainting:painting];
+    }
 }
 
-- (UkeDrawingCanvas *)canvas {
-    if (!_canvas) {
+- (void)turnToPreviousPage {
+    // 移除当前画布
+    [_currentCanvas removeFromSuperview];
+    _currentCanvas = nil;
+    
+    _currentIndex --;
+    if (_currentIndex < 0) return;
+    // 创建新画布
+    [self createCanvas];
+    CALayer *painting = _allPaintings[_currentIndex];
+    [_currentCanvas setCurrentPainting:painting];
+}
+
+- (UkeDrawingCanvas *)createCanvas {
+    if (!_currentCanvas) {
         UkeDrawingCanvas *canvas = [[UkeDrawingCanvas alloc] init];
         canvas.frame = self.bounds;
-        canvas.delegate = self;
         [self addSubview:canvas];
-        _canvas = canvas;
+        _currentCanvas = canvas;
+        
     }
-    return _canvas;
+    return _currentCanvas;
 }
 
 @end
