@@ -70,12 +70,18 @@
     shapeLayer.frame = self.bounds;
     shapeLayer.fillColor = [UIColor clearColor].CGColor;
     shapeLayer.strokeColor = [UIColor redColor].CGColor;
+    shapeLayer.lineWidth = 4.0;
+    
     if (_currentDrawingMode == UkeDrawingModeEraser) {
+        shapeLayer.lineWidth = 10.0;
+        shapeLayer.strokeColor = [UIColor whiteColor].CGColor;
+    }else if (_currentDrawingMode == UkeDrawingModeEraserRectangle) {
+        shapeLayer.lineWidth = 1.0;
+        shapeLayer.fillColor = [UIColor whiteColor].CGColor;
         shapeLayer.strokeColor = [UIColor whiteColor].CGColor;
     }
-    shapeLayer.lineWidth = 4.0;
-    shapeLayer.path = path;
     
+    shapeLayer.path = path;
     
     [self insertSublayer:shapeLayer below:_paintingLayer];
     

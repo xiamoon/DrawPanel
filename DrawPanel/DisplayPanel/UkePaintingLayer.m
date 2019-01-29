@@ -44,6 +44,7 @@
     CGContextSetLineWidth(context, 4.0);
     
     CGContextSetStrokeColorWithColor(context, [UIColor redColor].CGColor);
+    CGContextSetFillColorWithColor(context, [UIColor clearColor].CGColor);
     
     if (_path == NULL) {
         _path = CGPathCreateMutable();
@@ -93,6 +94,7 @@
         }
         CGPathRelease(rectanglePath);
     }else if (_currentDrawingMode == UkeDrawingModeEraser) { //! 画橡皮擦
+        CGContextSetLineWidth(context, 10.0);
         CGContextSetStrokeColorWithColor(context, [UIColor whiteColor].CGColor);
 
         if (_drawingState == UkeDrawingStateStart) {
@@ -107,6 +109,19 @@
             CGPathRelease(_path);
             _path = NULL;
         }
+    }else if (_currentDrawingMode == UkeDrawingModeEraserRectangle) { //! 框选删除
+        CGContextSetLineWidth(context, 1.0);
+        CGContextSetStrokeColorWithColor(context, [UIColor whiteColor].CGColor);
+        CGContextSetFillColorWithColor(context, [UIColor whiteColor].CGColor);
+
+        CGMutablePathRef rectanglePath = CGPathCreateMutable();
+        CGPathAddRect(rectanglePath, NULL, CGRectMake(_startPoint.x, _startPoint.y, _currentPoint.x-_startPoint.x, _currentPoint.y-_startPoint.y));
+        CGContextAddPath(context, rectanglePath);
+        CGContextDrawPath(context, kCGPathFill);
+        if (_drawingState == UkeDrawingStateEnd) {
+            [self.drawingDelegate paintingLayer:self didEndDrawingOneStrokeWithPath:rectanglePath];
+        }
+        CGPathRelease(rectanglePath);
     }
 }
 
