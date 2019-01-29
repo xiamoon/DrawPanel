@@ -122,6 +122,17 @@
             [self.drawingDelegate paintingLayer:self didEndDrawingOneStrokeWithPath:rectanglePath];
         }
         CGPathRelease(rectanglePath);
+    }else if (_currentDrawingMode == UkeDrawingModeTriangle) { //! 画三角形
+        CGMutablePathRef trianglePath = CGPathCreateMutable();
+        CGPoint points[3] = {{_startPoint.x, _startPoint.y}, {_currentPoint.x, _currentPoint.y}, {2*_startPoint.x-_currentPoint.x, _currentPoint.y}};
+        CGPathAddLines(trianglePath, NULL, points, 3);
+        CGPathCloseSubpath(trianglePath);
+        CGContextAddPath(context, trianglePath);
+        CGContextDrawPath(context, kCGPathStroke);
+        if (_drawingState == UkeDrawingStateEnd) {
+            [self.drawingDelegate paintingLayer:self didEndDrawingOneStrokeWithPath:trianglePath];
+        }
+        CGPathRelease(trianglePath);
     }
 }
 
