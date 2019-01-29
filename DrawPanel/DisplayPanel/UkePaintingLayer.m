@@ -16,8 +16,6 @@
 @property (nonatomic, assign) CGPoint currentPoint;
 //! 画笔路径
 @property (nonatomic, assign) CGMutablePathRef path;
-//! 所有的笔画
-@property (nonatomic, strong) NSMutableArray<CAShapeLayer *> *allStrokes;
 @end
 
 @implementation UkePaintingLayer
@@ -25,8 +23,7 @@
 - (instancetype)init {
     self = [super init];
     if (self) {
-        self.backgroundColor = [UIColor greenColor].CGColor;
-        _allStrokes = [NSMutableArray array];
+        self.backgroundColor = [UIColor clearColor].CGColor;
     }
     return self;
 }
@@ -35,23 +32,6 @@
     _startPoint = startPoint;
     _currentPoint = currentPoint;
     [self setNeedsDisplay];
-}
-
-- (void)didEndDrawingOneStroke:(CGPathRef)path {
-    CAShapeLayer *shapeLayer = [CAShapeLayer layer];
-    shapeLayer.lineCap = @"round";
-    shapeLayer.lineJoin = @"round";
-    shapeLayer.frame = self.bounds;
-    shapeLayer.fillColor = [UIColor clearColor].CGColor;
-    shapeLayer.strokeColor = [UIColor redColor].CGColor;
-    if (_currentDrawingMode == UkeDrawingModeEraser) {
-        shapeLayer.strokeColor = [UIColor whiteColor].CGColor;
-    }
-    shapeLayer.lineWidth = 4.0;
-    shapeLayer.path = path;
-    [self addSublayer:shapeLayer];
-    
-    [_allStrokes addObject:shapeLayer];
 }
 
 - (void)drawInContext:(CGContextRef)ctx {
@@ -63,7 +43,7 @@
     CGContextSetMiterLimit(context, 2.0);
     CGContextSetLineWidth(context, 4.0);
     
-    [[UIColor redColor] setStroke];
+    CGContextSetStrokeColorWithColor(context, [UIColor redColor].CGColor);
     
     if (_path == NULL) {
         _path = CGPathCreateMutable();
@@ -78,7 +58,7 @@
         CGContextAddPath(context, _path);
         CGContextDrawPath(context, kCGPathStroke);
         if (_drawingState == UkeDrawingStateEnd) {
-            [self didEndDrawingOneStroke:_path];
+            [self.drawingDelegate paintingLayer:self didEndDrawingOneStrokeWithPath:_path];
             CGPathRelease(_path);
             _path = NULL;
         }
@@ -90,7 +70,7 @@
         CGContextAddPath(context, segmentPath);
         CGContextDrawPath(context, kCGPathStroke);
         if (_drawingState == UkeDrawingStateEnd) {
-            [self didEndDrawingOneStroke:segmentPath];
+            [self.drawingDelegate paintingLayer:self didEndDrawingOneStrokeWithPath:segmentPath];
         }
         CGPathRelease(segmentPath);
     }
@@ -100,7 +80,7 @@
         CGContextAddPath(context, ellipsePath);
         CGContextDrawPath(context, kCGPathStroke);
         if (_drawingState == UkeDrawingStateEnd) {
-            [self didEndDrawingOneStroke:ellipsePath];
+            [self.drawingDelegate paintingLayer:self didEndDrawingOneStrokeWithPath:ellipsePath];
         }
         CGPathRelease(ellipsePath);
     }else if (_currentDrawingMode == UkeDrawingModeRectangle) { //! 画框
@@ -109,12 +89,12 @@
         CGContextAddPath(context, rectanglePath);
         CGContextDrawPath(context, kCGPathStroke);
         if (_drawingState == UkeDrawingStateEnd) {
-            [self didEndDrawingOneStroke:rectanglePath];
+            [self.drawingDelegate paintingLayer:self didEndDrawingOneStrokeWithPath:rectanglePath];
         }
         CGPathRelease(rectanglePath);
     }else if (_currentDrawingMode == UkeDrawingModeEraser) { //! 画橡皮擦
-        [[UIColor whiteColor] setStroke];
-        
+        CGContextSetStrokeColorWithColor(context, [UIColor whiteColor].CGColor);
+
         if (_drawingState == UkeDrawingStateStart) {
             CGPathMoveToPoint(_path, NULL, _currentPoint.x, _currentPoint.y);
         }else {
@@ -123,7 +103,7 @@
         CGContextAddPath(context, _path);
         CGContextDrawPath(context, kCGPathStroke);
         if (_drawingState == UkeDrawingStateEnd) {
-            [self didEndDrawingOneStroke:_path];
+            [self.drawingDelegate paintingLayer:self didEndDrawingOneStrokeWithPath:_path];
             CGPathRelease(_path);
             _path = NULL;
         }

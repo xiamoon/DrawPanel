@@ -7,14 +7,13 @@
 //
 
 #import "UkeDrawingCanvas.h"
-#import "UkePaintingLayer.h"
+#import "UkePaintingDisplayLayer.h"
 
 @interface UkeDrawingCanvas ()
-//! 绘画的layer
-@property (nonatomic, strong) UkePaintingLayer *paintingLayer;
-// 手势状态
-@property (nonatomic, assign) UIGestureRecognizerState state;
-
+//! 绘画展示的layer
+@property (nonatomic, strong) UkePaintingDisplayLayer *displayLayer;
+//! 绘画起始点
+@property (nonatomic, assign) CGPoint startPoint;
 @end
 
 @implementation UkeDrawingCanvas
@@ -24,11 +23,11 @@
     if (self) {
         self.backgroundColor = [UIColor clearColor];
         
+        _displayLayer = [[UkePaintingDisplayLayer alloc] init];
+        [self.layer addSublayer:_displayLayer];
+        
         UIPanGestureRecognizer *pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePanGesture:)];
         [self addGestureRecognizer:pan];
-        
-        _paintingLayer = [[UkePaintingLayer alloc] init];
-        [self.layer addSublayer:_paintingLayer];
     }
     return self;
 }
@@ -36,23 +35,25 @@
 - (void)willMoveToSuperview:(UIView *)newSuperview {
     [super willMoveToSuperview:newSuperview];
     if (newSuperview) {
-        _paintingLayer.frame = self.frame;
+        _displayLayer.frame = self.frame;
     }
+}
+
+- (void)setCurrentDrawingMode:(UkeDrawingMode)currentDrawingMode {
+    _currentDrawingMode = currentDrawingMode;
+    _displayLayer.currentDrawingMode = currentDrawingMode;
 }
 
 - (void)handlePanGesture:(UIGestureRecognizer *)pan {
     CGPoint point = [pan locationInView:self];
     
-    _state = pan.state;
-    
-    CGPoint startPoint = CGPointZero;
-    if (_state == UIGestureRecognizerStateBegan) {
-        startPoint = point;
+    if (pan.state == UIGestureRecognizerStateBegan) {
+        _startPoint = point;
     }
     CGPoint currentPoint = point;
     
-    [_paintingLayer setDrawingState:[self drawingStateFromGestureState:pan.state]];
-    [_paintingLayer drawWithStartPoint:startPoint currentPoint:currentPoint];
+    [_displayLayer setDrawingState:[self drawingStateFromGestureState:pan.state]];
+    [_displayLayer drawWithStartPoint:_startPoint currentPoint:currentPoint];
 }
 
 - (UkeDrawingState)drawingStateFromGestureState:(UIGestureRecognizerState)state {
@@ -69,20 +70,12 @@
     return drawingState;
 }
 
-- (CALayer *)currentPainting {
-    return self.layer;
+- (NSArray<CAShapeLayer *> *)currentStrokes {
+    return _displayLayer.currentStrokes;
 }
 
-- (void)setCurrentPainting:(CALayer *)currentPainting {
-    NSArray *sublayers = currentPainting.sublayers.copy;
-    if (sublayers.count) {
-        for (int i = 0; i < sublayers.count; i++) {
-            CALayer *layer = sublayers[i];
-//            [self.layer addSublayer:layer];
-            [self.layer insertSublayer:layer below:_paintingLayer];
-
-        }
-    }
+- (void)setCurrentStrokes:(NSArray<CAShapeLayer *> *)currentStrokes {
+    [_displayLayer setCurrentStrokes:currentStrokes];
 }
 
 - (void)dealloc {
