@@ -77,11 +77,30 @@
         shapeLayer.strokeColor = [UIColor whiteColor].CGColor;
     }else if (_currentDrawingMode == UkeDrawingModeEraserRectangle) {
         shapeLayer.lineWidth = 1.0;
-        shapeLayer.fillColor = [UIColor whiteColor].CGColor;
-        shapeLayer.strokeColor = [UIColor whiteColor].CGColor;
+        shapeLayer.fillColor = nil;
+        shapeLayer.strokeColor = nil;
     }
     
     shapeLayer.path = path;
+    
+    [self insertSublayer:shapeLayer below:_paintingLayer];
+    
+    [_allStrokes addObject:shapeLayer];
+}
+
+- (void)paintingLayer:(UkePaintingLayer *)layer
+    didEndDrawingText:(NSAttributedString *)attributedString
+             position:(CGPoint)position {
+    CAShapeLayer *shapeLayer = [CAShapeLayer layer];
+    shapeLayer.frame = self.bounds;
+    shapeLayer.fillColor = [UIColor clearColor].CGColor;
+    
+    CGSize textSize = [attributedString boundingRectWithSize:CGSizeMake(375, 667) options:NSStringDrawingUsesLineFragmentOrigin context:NULL].size;
+    
+    CATextLayer *textLayer = [[CATextLayer alloc] init];
+    textLayer.string = attributedString;
+    textLayer.frame = CGRectMake(position.x, position.y, textSize.width, textSize.height);
+    [shapeLayer addSublayer:textLayer];
     
     [self insertSublayer:shapeLayer below:_paintingLayer];
     

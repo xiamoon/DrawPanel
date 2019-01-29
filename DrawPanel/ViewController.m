@@ -45,6 +45,13 @@
     [button2 addTarget:self action:@selector(handleButtonAction:) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:button2];
     
+    UIImageView *bgView = [[UIImageView alloc] init];
+    bgView.contentMode = UIViewContentModeScaleAspectFill;
+    bgView.layer.masksToBounds = YES;
+    bgView.frame = CGRectMake(0, CGRectGetMaxY(button.frame), CGRectGetWidth(self.view.bounds), CGRectGetHeight(self.view.bounds)-44.0*2);
+    bgView.image = [UIImage imageNamed:@"test.jpeg"];
+    [self.view addSubview:bgView];
+    
     UkeDrawingDisplayPanel *panel = [[UkeDrawingDisplayPanel alloc] init];
     panel.frame = CGRectMake(0, CGRectGetMaxY(button.frame), CGRectGetWidth(self.view.bounds), CGRectGetHeight(self.view.bounds)-44.0*2);
     [self.view addSubview:panel];

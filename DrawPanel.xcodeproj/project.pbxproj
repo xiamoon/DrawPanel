@@ -19,6 +19,7 @@
 		54A3363D21FC67DB00B7AD5C /* UkeDrawingCanvas.m in Sources */ = {isa = PBXBuildFile; fileRef = 54A3363C21FC67DB00B7AD5C /* UkeDrawingCanvas.m */; };
 		54DCDEB621FFED2A00B48C8B /* UkePaintingLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 54DCDEB521FFED2A00B48C8B /* UkePaintingLayer.m */; };
 		54DCDEB921FFED9300B48C8B /* UkePaintingDisplayLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 54DCDEB821FFED9300B48C8B /* UkePaintingDisplayLayer.m */; };
+		54DCDEBB22004C7500B48C8B /* test.jpeg in Resources */ = {isa = PBXBuildFile; fileRef = 54DCDEBA22004C7500B48C8B /* test.jpeg */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -64,6 +65,7 @@
 		54DCDEB521FFED2A00B48C8B /* UkePaintingLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UkePaintingLayer.m; sourceTree = "<group>"; };
 		54DCDEB721FFED9300B48C8B /* UkePaintingDisplayLayer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UkePaintingDisplayLayer.h; sourceTree = "<group>"; };
 		54DCDEB821FFED9300B48C8B /* UkePaintingDisplayLayer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UkePaintingDisplayLayer.m; sourceTree = "<group>"; };
+		54DCDEBA22004C7500B48C8B /* test.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = test.jpeg; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -118,8 +120,8 @@
 				54A3360721FC11DB00B7AD5C /* AppDelegate.m */,
 				54A3360921FC11DB00B7AD5C /* ViewController.h */,
 				54A3360A21FC11DB00B7AD5C /* ViewController.m */,
-				54A3363E21FC695800B7AD5C /* UkeDrawingConstants.h */,
 				54A3363821FC120E00B7AD5C /* UkeDrawingDisplayPanel.h */,
+				54A3363E21FC695800B7AD5C /* UkeDrawingConstants.h */,
 				54A3363921FC120E00B7AD5C /* UkeDrawingDisplayPanel.m */,
 				54A3363B21FC67DB00B7AD5C /* UkeDrawingCanvas.h */,
 				54A3363C21FC67DB00B7AD5C /* UkeDrawingCanvas.m */,
@@ -129,6 +131,7 @@
 				54A3361121FC11DD00B7AD5C /* LaunchScreen.storyboard */,
 				54A3361421FC11DD00B7AD5C /* Info.plist */,
 				54A3361521FC11DD00B7AD5C /* main.m */,
+				54DCDEBA22004C7500B48C8B /* test.jpeg */,
 			);
 			path = DrawPanel;
 			sourceTree = "<group>";
@@ -266,6 +269,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				54A3361321FC11DD00B7AD5C /* LaunchScreen.storyboard in Resources */,
+				54DCDEBB22004C7500B48C8B /* test.jpeg in Resources */,
 				54A3361021FC11DD00B7AD5C /* Assets.xcassets in Resources */,
 				54A3360E21FC11DB00B7AD5C /* Main.storyboard in Resources */,
 			);

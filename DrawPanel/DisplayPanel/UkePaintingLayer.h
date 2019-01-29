@@ -15,6 +15,9 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol UkePaintingLayerDelegate <NSObject>
 - (void)paintingLayer:(UkePaintingLayer *)layer
         didEndDrawingOneStrokeWithPath:(CGPathRef)path;
+- (void)paintingLayer:(UkePaintingLayer *)layer
+    didEndDrawingText:(NSAttributedString *)attributedString
+             position:(CGPoint)position;
 @end
 
 @interface UkePaintingLayer : CALayer
