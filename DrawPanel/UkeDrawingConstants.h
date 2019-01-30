@@ -17,7 +17,7 @@ typedef NS_ENUM(NSInteger, UkeDrawingMode) {
     UkeDrawingModeWords, //! 文字
     UkeDrawingModeEraser, //! 橡皮擦
     UkeDrawingModeEraserRectangle, //! 框选删除
-    UkeDrawingModeEraserArrow, //! 箭头
+    UkeDrawingModeArrow, //! 箭头
     UkeDrawingModeTriangle, //! 三角形
 };
 

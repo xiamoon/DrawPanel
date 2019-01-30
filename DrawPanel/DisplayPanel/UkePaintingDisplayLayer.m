@@ -60,6 +60,24 @@
 - (void)drawWithStartPoint:(CGPoint)startPoint
               currentPoint:(CGPoint)currentPoint {
     [_paintingLayer drawWithStartPoint:startPoint currentPoint:currentPoint];
+    
+//    // test
+//    if (_currentDrawingMode == UkeDrawingModeEraser) {
+//        UIGraphicsBeginImageContext(self.frame.size);
+//        CGContextSetLineWidth(UIGraphicsGetCurrentContext(), 10.0);
+//        if (_drawingState == UkeDrawingStateStart) {
+//            [self renderInContext:UIGraphicsGetCurrentContext()];
+//            CGContextSetBlendMode(UIGraphicsGetCurrentContext(), kCGBlendModeClear);
+//            CGContextMoveToPoint(UIGraphicsGetCurrentContext(), startPoint.x, startPoint.y);
+//        }else if (_drawingState == UkeDrawingStateDrawing) {
+//            CGContextAddLineToPoint(UIGraphicsGetCurrentContext(), currentPoint.x, currentPoint.y);
+//        }else if (_drawingState == UkeDrawingStateEnd) {
+//            CGContextAddLineToPoint(UIGraphicsGetCurrentContext(), currentPoint.x, currentPoint.y);
+//            UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+//            UIGraphicsEndImageContext();
+//            self.contents = (id)image.CGImage;
+//        }
+//    }
 }
 
 #pragma mark - UkePaintingLayerDelegate
@@ -79,6 +97,23 @@
         shapeLayer.lineWidth = 1.0;
         shapeLayer.fillColor = nil;
         shapeLayer.strokeColor = nil;
+        
+        UIGraphicsBeginImageContext(self.frame.size);
+        CGContextRef context = UIGraphicsGetCurrentContext();
+        [self renderInContext:context];
+        
+//        CGContextAddPath(context, path);
+//        CGContextSetStrokeColorWithColor(context, [UIColor whiteColor].CGColor);
+//        CGContextSetBlendMode(context, kCGBlendModeClear);
+//        CGContextStrokePath(context);
+        
+        CGContextClearRect(context, CGRectMake(50, 100, 100, 100));
+        
+        UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+        self.contents = (id)image.CGImage;
+        UIGraphicsEndImageContext();
+
+        return;
     }
     
     shapeLayer.path = path;
