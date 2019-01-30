@@ -15,7 +15,6 @@
 @property (nonatomic, strong) UkePaintingLayer *paintingLayer;
 //! 作为线条容器的layer
 @property (nonatomic, strong) CALayer *containerLayer;
-
 //! 所有的笔画
 @property (nonatomic, strong) NSMutableArray<CAShapeLayer *> *allStrokes;
 
@@ -35,9 +34,7 @@
 
         _paintingLayer = [[UkePaintingLayer alloc] init];
         _paintingLayer.drawingDelegate = self;
-        [self addSublayer:_paintingLayer];
-        
-        _path = CGPathCreateMutable();
+        [self addSublayer:_paintingLayer];        
     }
     return self;
 }
@@ -71,7 +68,41 @@
 
 - (void)drawWithStartPoint:(CGPoint)startPoint
               currentPoint:(CGPoint)currentPoint {
-    [_paintingLayer drawWithStartPoint:startPoint currentPoint:currentPoint];
+    if (_currentDrawingMode == UkeDrawingModeEraser) {
+        UIGraphicsBeginImageContext(self.frame.size);
+        CGContextRef context = UIGraphicsGetCurrentContext();
+        [_containerLayer renderInContext:context];
+        
+        if (_path == NULL) {
+            _path = CGPathCreateMutable();
+        }
+        CGContextSetLineCap(context, kCGLineCapRound);
+        CGContextSetLineJoin(context, kCGLineJoinRound);
+        CGContextSetMiterLimit(context, 2.0);
+        CGContextSetLineWidth(context, 10.0);
+        CGContextSetFillColorWithColor(context, [UIColor clearColor].CGColor);
+        CGContextSetStrokeColorWithColor(context, [UIColor redColor].CGColor);
+        CGContextSetBlendMode(context, kCGBlendModeClear);
+        if (_drawingState == UkeDrawingStateStart) {
+            CGPathMoveToPoint(_path, NULL, currentPoint.x, currentPoint.y);
+        }else {
+            CGPathAddLineToPoint(_path, NULL, currentPoint.x, currentPoint.y);
+        }
+        CGContextAddPath(context, _path);
+        CGContextDrawPath(context, kCGPathStroke);
+        
+        UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+        _containerLayer.contents = (id)image.CGImage;
+        UIGraphicsEndImageContext();
+        
+        if (_drawingState == UkeDrawingStateEnd) {
+            CGContextClearRect(context, self.frame);
+            CGPathRelease(_path);
+            _path = NULL;
+        }
+    }else {
+        [_paintingLayer drawWithStartPoint:startPoint currentPoint:currentPoint];
+    }
 }
 
 #pragma mark - UkePaintingLayerDelegate
@@ -102,31 +133,9 @@
     UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
     _containerLayer.contents = (id)image.CGImage;
     UIGraphicsEndImageContext();
-    
-//    CAShapeLayer *shapeLayer = [CAShapeLayer layer];
-//    shapeLayer.lineCap = @"round";
-//    shapeLayer.lineJoin = @"round";
-//    shapeLayer.frame = self.bounds;
-//    shapeLayer.fillColor = [UIColor clearColor].CGColor;
-//    shapeLayer.strokeColor = [UIColor redColor].CGColor;
-//    shapeLayer.lineWidth = 4.0;
-//
-//    if (_currentDrawingMode == UkeDrawingModeEraser) {
-//        shapeLayer.lineWidth = 10.0;
-//        shapeLayer.strokeColor = [UIColor whiteColor].CGColor;
-//    }else if (_currentDrawingMode == UkeDrawingModeEraserRectangle) {
-//        shapeLayer.lineWidth = 1.0;
-//        shapeLayer.fillColor = nil;
-//        shapeLayer.strokeColor = nil;
-//    }
-//
-//    shapeLayer.path = path;
-//
-//    [self insertSublayer:shapeLayer below:_paintingLayer];
-//
-//    [_allStrokes addObject:shapeLayer];
 }
 
+//! 橡皮擦
 - (void)paintingLayer:(UkePaintingLayer *)layer drawingOneStrokeWithPath:(CGPathRef)path {
     if (_currentDrawingMode != UkeDrawingModeEraser) return;
     
