@@ -7,11 +7,11 @@
 //
 
 #import "UkeDrawingCanvas.h"
-#import "UkePaintingDisplayLayer.h"
+#import "UkePaintingView.h"
 
 @interface UkeDrawingCanvas ()
 //! 绘画展示的layer
-@property (nonatomic, strong) UkePaintingDisplayLayer *displayLayer;
+@property (nonatomic, strong) UkePaintingView *paintingView;
 //! 绘画起始点
 @property (nonatomic, assign) CGPoint startPoint;
 @end
@@ -23,8 +23,8 @@
     if (self) {
         self.backgroundColor = [UIColor clearColor];
         
-        _displayLayer = [[UkePaintingDisplayLayer alloc] init];
-        [self.layer addSublayer:_displayLayer];
+        _paintingView = [[UkePaintingView alloc] init];
+        [self addSubview:_paintingView];
         
         UIPanGestureRecognizer *pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePanGesture:)];
         [self addGestureRecognizer:pan];
@@ -35,13 +35,13 @@
 - (void)willMoveToSuperview:(UIView *)newSuperview {
     [super willMoveToSuperview:newSuperview];
     if (newSuperview) {
-        _displayLayer.frame = self.frame;
+        _paintingView.frame = self.frame;
     }
 }
 
 - (void)setCurrentDrawingMode:(UkeDrawingMode)currentDrawingMode {
     _currentDrawingMode = currentDrawingMode;
-    _displayLayer.currentDrawingMode = currentDrawingMode;
+    _paintingView.currentDrawingMode = currentDrawingMode;
 }
 
 - (void)handlePanGesture:(UIGestureRecognizer *)pan {
@@ -52,8 +52,8 @@
     }
     CGPoint currentPoint = point;
     
-    [_displayLayer setDrawingState:[self drawingStateFromGestureState:pan.state]];
-    [_displayLayer drawWithStartPoint:_startPoint currentPoint:currentPoint];
+    [_paintingView setDrawingState:[self drawingStateFromGestureState:pan.state]];
+    [_paintingView drawWithStartPoint:_startPoint currentPoint:currentPoint];
 }
 
 - (UkeDrawingState)drawingStateFromGestureState:(UIGestureRecognizerState)state {
@@ -71,11 +71,11 @@
 }
 
 - (NSArray<CAShapeLayer *> *)currentStrokes {
-    return _displayLayer.currentStrokes;
+    return _paintingView.currentStrokes;
 }
 
 - (void)setCurrentStrokes:(NSArray<CAShapeLayer *> *)currentStrokes {
-    [_displayLayer setCurrentStrokes:currentStrokes];
+    [_paintingView setCurrentStrokes:currentStrokes];
 }
 
 - (void)dealloc {

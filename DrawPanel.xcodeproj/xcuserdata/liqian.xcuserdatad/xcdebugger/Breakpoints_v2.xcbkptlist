@@ -16,17 +16,15 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            shouldBeEnabled = "No"
+            shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "DrawPanel/DisplayPanel/UkePaintingLayer.m"
-            timestampString = "570450757.282753"
+            filePath = "DrawPanel/DisplayPanel/UkePaintingDisplayLayer.m"
+            timestampString = "570620799.018199"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "134"
-            endingLineNumber = "134"
-            landmarkName = "-drawInContext:"
-            landmarkType = "7">
+            startingLineNumber = "145"
+            endingLineNumber = "145">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

@@ -20,6 +20,8 @@
 		54DCDEB621FFED2A00B48C8B /* UkePaintingLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 54DCDEB521FFED2A00B48C8B /* UkePaintingLayer.m */; };
 		54DCDEB921FFED9300B48C8B /* UkePaintingDisplayLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 54DCDEB821FFED9300B48C8B /* UkePaintingDisplayLayer.m */; };
 		54DCDEBB22004C7500B48C8B /* test.jpeg in Resources */ = {isa = PBXBuildFile; fileRef = 54DCDEBA22004C7500B48C8B /* test.jpeg */; };
+		54DCDF022202CE0900B48C8B /* UkePaintingView.m in Sources */ = {isa = PBXBuildFile; fileRef = 54DCDF012202CE0900B48C8B /* UkePaintingView.m */; };
+		54DCDF052202E23600B48C8B /* UkePathInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 54DCDF042202E23600B48C8B /* UkePathInfo.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -66,6 +68,10 @@
 		54DCDEB721FFED9300B48C8B /* UkePaintingDisplayLayer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UkePaintingDisplayLayer.h; sourceTree = "<group>"; };
 		54DCDEB821FFED9300B48C8B /* UkePaintingDisplayLayer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UkePaintingDisplayLayer.m; sourceTree = "<group>"; };
 		54DCDEBA22004C7500B48C8B /* test.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = test.jpeg; sourceTree = "<group>"; };
+		54DCDF002202CE0900B48C8B /* UkePaintingView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UkePaintingView.h; sourceTree = "<group>"; };
+		54DCDF012202CE0900B48C8B /* UkePaintingView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UkePaintingView.m; sourceTree = "<group>"; };
+		54DCDF032202E23600B48C8B /* UkePathInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UkePathInfo.h; sourceTree = "<group>"; };
+		54DCDF042202E23600B48C8B /* UkePathInfo.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UkePathInfo.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -120,11 +126,15 @@
 				54A3360721FC11DB00B7AD5C /* AppDelegate.m */,
 				54A3360921FC11DB00B7AD5C /* ViewController.h */,
 				54A3360A21FC11DB00B7AD5C /* ViewController.m */,
-				54A3363821FC120E00B7AD5C /* UkeDrawingDisplayPanel.h */,
 				54A3363E21FC695800B7AD5C /* UkeDrawingConstants.h */,
+				54A3363821FC120E00B7AD5C /* UkeDrawingDisplayPanel.h */,
 				54A3363921FC120E00B7AD5C /* UkeDrawingDisplayPanel.m */,
 				54A3363B21FC67DB00B7AD5C /* UkeDrawingCanvas.h */,
 				54A3363C21FC67DB00B7AD5C /* UkeDrawingCanvas.m */,
+				54DCDF002202CE0900B48C8B /* UkePaintingView.h */,
+				54DCDF012202CE0900B48C8B /* UkePaintingView.m */,
+				54DCDF032202E23600B48C8B /* UkePathInfo.h */,
+				54DCDF042202E23600B48C8B /* UkePathInfo.m */,
 				54DCDEB321FFED2A00B48C8B /* DisplayPanel */,
 				54A3360C21FC11DB00B7AD5C /* Main.storyboard */,
 				54A3360F21FC11DD00B7AD5C /* Assets.xcassets */,
@@ -302,6 +312,8 @@
 				54A3363A21FC120E00B7AD5C /* UkeDrawingDisplayPanel.m in Sources */,
 				54DCDEB621FFED2A00B48C8B /* UkePaintingLayer.m in Sources */,
 				54A3363D21FC67DB00B7AD5C /* UkeDrawingCanvas.m in Sources */,
+				54DCDF052202E23600B48C8B /* UkePathInfo.m in Sources */,
+				54DCDF022202CE0900B48C8B /* UkePaintingView.m in Sources */,
 				54A3360821FC11DB00B7AD5C /* AppDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

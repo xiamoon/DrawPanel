@@ -15,6 +15,10 @@
 @property (nonatomic, strong) UkePaintingLayer *paintingLayer;
 //! 所有的笔画
 @property (nonatomic, strong) NSMutableArray<CAShapeLayer *> *allStrokes;
+
+@property (nonatomic, assign) CGMutablePathRef allPaths;
+@property (nonatomic, strong) CALayer *containerLayer;
+
 @end
 
 @implementation UkePaintingDisplayLayer
@@ -23,7 +27,11 @@
     self = [super init];
     if (self) {
         _allStrokes = [NSMutableArray array];
-
+        
+        _allPaths = CGPathCreateMutable();
+        _containerLayer = [[CALayer alloc] init];
+        [self addSublayer:_containerLayer];
+        
         _paintingLayer = [[UkePaintingLayer alloc] init];
         _paintingLayer.drawingDelegate = self;
         [self addSublayer:_paintingLayer];
@@ -33,6 +41,7 @@
 
 - (void)setFrame:(CGRect)frame {
     [super setFrame:frame];
+    _containerLayer.frame = self.frame;
     _paintingLayer.frame = self.frame;
 }
 
@@ -71,7 +80,7 @@
     shapeLayer.fillColor = [UIColor clearColor].CGColor;
     shapeLayer.strokeColor = [UIColor redColor].CGColor;
     shapeLayer.lineWidth = 4.0;
-    
+
     if (_currentDrawingMode == UkeDrawingModeEraser) {
         shapeLayer.lineWidth = 10.0;
         shapeLayer.strokeColor = [UIColor whiteColor].CGColor;
@@ -80,12 +89,33 @@
         shapeLayer.fillColor = nil;
         shapeLayer.strokeColor = nil;
     }
-    
+
     shapeLayer.path = path;
-    
+
     [self insertSublayer:shapeLayer below:_paintingLayer];
-    
+
     [_allStrokes addObject:shapeLayer];
+//
+//    CGPathAddPath(_allPaths, NULL, path);
+//
+//    UIGraphicsBeginImageContext(self.frame.size);
+//    CGContextRef context = UIGraphicsGetCurrentContext();
+//
+//    if (_currentDrawingMode == UkeDrawingModeEraser) {
+//
+//    }else {
+//
+//    }
+//
+//
+//    CGContextSetLineWidth(context, 4.0);
+//    CGContextSetStrokeColorWithColor(context, [UIColor redColor].CGColor);
+//    CGContextAddPath(context, _allPaths);
+//    CGContextDrawPath(context, kCGPathStroke);
+//
+//    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+//    _containerLayer.contents = (id)image.CGImage;
+//    UIGraphicsEndImageContext();
 }
 
 - (void)paintingLayer:(UkePaintingLayer *)layer
