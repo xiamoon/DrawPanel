@@ -17,8 +17,6 @@
 		54A3362B21FC11DD00B7AD5C /* DrawPanelUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 54A3362A21FC11DD00B7AD5C /* DrawPanelUITests.m */; };
 		54A3363A21FC120E00B7AD5C /* UkeDrawingDisplayPanel.m in Sources */ = {isa = PBXBuildFile; fileRef = 54A3363921FC120E00B7AD5C /* UkeDrawingDisplayPanel.m */; };
 		54A3363D21FC67DB00B7AD5C /* UkeDrawingCanvas.m in Sources */ = {isa = PBXBuildFile; fileRef = 54A3363C21FC67DB00B7AD5C /* UkeDrawingCanvas.m */; };
-		54DCDEB621FFED2A00B48C8B /* UkePaintingLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 54DCDEB521FFED2A00B48C8B /* UkePaintingLayer.m */; };
-		54DCDEB921FFED9300B48C8B /* UkePaintingDisplayLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 54DCDEB821FFED9300B48C8B /* UkePaintingDisplayLayer.m */; };
 		54DCDEBB22004C7500B48C8B /* test.jpeg in Resources */ = {isa = PBXBuildFile; fileRef = 54DCDEBA22004C7500B48C8B /* test.jpeg */; };
 		54DCDF022202CE0900B48C8B /* UkePaintingView.m in Sources */ = {isa = PBXBuildFile; fileRef = 54DCDF012202CE0900B48C8B /* UkePaintingView.m */; };
 		54DCDF052202E23600B48C8B /* UkePathInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 54DCDF042202E23600B48C8B /* UkePathInfo.m */; };
@@ -63,10 +61,6 @@
 		54A3363B21FC67DB00B7AD5C /* UkeDrawingCanvas.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UkeDrawingCanvas.h; sourceTree = "<group>"; };
 		54A3363C21FC67DB00B7AD5C /* UkeDrawingCanvas.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UkeDrawingCanvas.m; sourceTree = "<group>"; };
 		54A3363E21FC695800B7AD5C /* UkeDrawingConstants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UkeDrawingConstants.h; sourceTree = "<group>"; };
-		54DCDEB421FFED2A00B48C8B /* UkePaintingLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UkePaintingLayer.h; sourceTree = "<group>"; };
-		54DCDEB521FFED2A00B48C8B /* UkePaintingLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UkePaintingLayer.m; sourceTree = "<group>"; };
-		54DCDEB721FFED9300B48C8B /* UkePaintingDisplayLayer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UkePaintingDisplayLayer.h; sourceTree = "<group>"; };
-		54DCDEB821FFED9300B48C8B /* UkePaintingDisplayLayer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UkePaintingDisplayLayer.m; sourceTree = "<group>"; };
 		54DCDEBA22004C7500B48C8B /* test.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = test.jpeg; sourceTree = "<group>"; };
 		54DCDF002202CE0900B48C8B /* UkePaintingView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UkePaintingView.h; sourceTree = "<group>"; };
 		54DCDF012202CE0900B48C8B /* UkePaintingView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UkePaintingView.m; sourceTree = "<group>"; };
@@ -135,7 +129,6 @@
 				54DCDF012202CE0900B48C8B /* UkePaintingView.m */,
 				54DCDF032202E23600B48C8B /* UkePathInfo.h */,
 				54DCDF042202E23600B48C8B /* UkePathInfo.m */,
-				54DCDEB321FFED2A00B48C8B /* DisplayPanel */,
 				54A3360C21FC11DB00B7AD5C /* Main.storyboard */,
 				54A3360F21FC11DD00B7AD5C /* Assets.xcassets */,
 				54A3361121FC11DD00B7AD5C /* LaunchScreen.storyboard */,
@@ -162,17 +155,6 @@
 				54A3362C21FC11DD00B7AD5C /* Info.plist */,
 			);
 			path = DrawPanelUITests;
-			sourceTree = "<group>";
-		};
-		54DCDEB321FFED2A00B48C8B /* DisplayPanel */ = {
-			isa = PBXGroup;
-			children = (
-				54DCDEB721FFED9300B48C8B /* UkePaintingDisplayLayer.h */,
-				54DCDEB821FFED9300B48C8B /* UkePaintingDisplayLayer.m */,
-				54DCDEB421FFED2A00B48C8B /* UkePaintingLayer.h */,
-				54DCDEB521FFED2A00B48C8B /* UkePaintingLayer.m */,
-			);
-			path = DisplayPanel;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -308,9 +290,7 @@
 			files = (
 				54A3360B21FC11DB00B7AD5C /* ViewController.m in Sources */,
 				54A3361621FC11DD00B7AD5C /* main.m in Sources */,
-				54DCDEB921FFED9300B48C8B /* UkePaintingDisplayLayer.m in Sources */,
 				54A3363A21FC120E00B7AD5C /* UkeDrawingDisplayPanel.m in Sources */,
-				54DCDEB621FFED2A00B48C8B /* UkePaintingLayer.m in Sources */,
 				54A3363D21FC67DB00B7AD5C /* UkeDrawingCanvas.m in Sources */,
 				54DCDF052202E23600B48C8B /* UkePathInfo.m in Sources */,
 				54DCDF022202CE0900B48C8B /* UkePaintingView.m in Sources */,
