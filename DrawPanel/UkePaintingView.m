@@ -132,43 +132,91 @@
         }else {
             [_currentPath addLineToPoint:currentPoint];
             
-//            UIGraphicsBeginImageContextWithOptions(self.frame.size, NO, [UIScreen mainScreen].scale);
-//            CGContextRef context = UIGraphicsGetCurrentContext();
-//            [self.layer renderInContext:context];
-//
-//            while (self.layer.sublayers.count) {
-//                [self.layer.sublayers.lastObject removeFromSuperlayer];
-//            }
-//
-//            CGContextSetLineWidth(context, 10);
-//            CGContextSetStrokeColorWithColor(context, [UIColor greenColor].CGColor);
-//            CGContextSetBlendMode(context, kCGBlendModeClear);
-//            CGContextAddPath(context, _currentPath.CGPath);
-//            CGContextDrawPath(context, kCGPathStroke);
-//            UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
-//            self.layer.contents = (id)image.CGImage;
-//            UIGraphicsEndImageContext();
+            UIGraphicsBeginImageContextWithOptions(self.frame.size, NO, [UIScreen mainScreen].scale);
+            CGContextRef context = UIGraphicsGetCurrentContext();
+            [self.layer renderInContext:context];
+
+            while (self.layer.sublayers.count) {
+                [self.layer.sublayers.lastObject removeFromSuperlayer];
+            }
+
+            CGContextSetLineWidth(context, 10);
+            CGContextSetBlendMode(context, kCGBlendModeClear);
+            CGContextAddPath(context, _currentPath.CGPath);
+            CGContextDrawPath(context, kCGPathStroke);
+            UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+            self.layer.contents = (id)image.CGImage;
+            UIGraphicsEndImageContext();
             
             if (_drawingState == UkeDrawingStateEnd) {
-                [_currentPath stroke];
-                CAShapeLayer *maskLayer = [[CAShapeLayer alloc] init];
-                maskLayer.frame = self.frame;
-                maskLayer.lineWidth = 10;
-                maskLayer.path = _currentPath.CGPath;
-                
-                UIImage *image = [UIImage imageNamed:@"test.jpeg"];
-                CAShapeLayer *layer = [[CAShapeLayer alloc] init];
-                layer.frame = self.frame;
-                layer.contents = (id)image.CGImage;
-                layer.mask = maskLayer;
-                [self.layer addSublayer:layer];
-                
-                _currentLayer = layer;
 
-
-                NSLog(@"---");
             }
         }
+    }else if (_currentDrawingMode == UkeDrawingModeEraserRectangle) { //! 框选删除
+        UIBezierPath *path = [UIBezierPath bezierPathWithRect:CGRectMake(startPoint.x, startPoint.y, currentPoint.x-startPoint.x, currentPoint.y-startPoint.y)];
+        _currentPath = path;
+        
+        if (_drawingState == UkeDrawingStateStart) {
+            CAShapeLayer *layer = [[CAShapeLayer alloc] init];
+            layer.backgroundColor = [UIColor clearColor].CGColor;
+            layer.fillColor = [[UIColor redColor] colorWithAlphaComponent:0.5].CGColor;
+            layer.strokeColor = [UIColor clearColor].CGColor;
+            layer.frame = self.frame;
+            [self.layer addSublayer:layer];
+            
+            _currentLayer = layer;
+        }else if (_drawingState == UkeDrawingStateEnd) {
+            UIGraphicsBeginImageContextWithOptions(self.frame.size, NO, [UIScreen mainScreen].scale);
+            CGContextRef context = UIGraphicsGetCurrentContext();
+            [self.layer renderInContext:context];
+            
+            while (self.layer.sublayers.count) {
+                [self.layer.sublayers.lastObject removeFromSuperlayer];
+            }
+            
+            CGContextSetLineWidth(context, 1.0);
+            CGContextSetBlendMode(context, kCGBlendModeClear);
+            CGContextAddPath(context, _currentPath.CGPath);
+            CGContextDrawPath(context, kCGPathFill);
+            UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+            self.layer.contents = (id)image.CGImage;
+            UIGraphicsEndImageContext();
+            
+            UkePathInfo *pathInfo = [[UkePathInfo alloc] init];
+            pathInfo.path = _currentPath;
+            pathInfo.blendMode = kCGBlendModeClear;
+            
+            [_paths addObject:pathInfo];
+        }
+        _currentLayer.path = _currentPath.CGPath;
+    }else if (_currentDrawingMode == UkeDrawingModeEraserArrow) {
+        
+    }else if (_currentDrawingMode == UkeDrawingModeTriangle) {
+        UIBezierPath *path = [UIBezierPath bezierPath];
+        [path moveToPoint:CGPointMake(startPoint.x, startPoint.y)];
+        [path addLineToPoint:CGPointMake(currentPoint.x, currentPoint.y)];
+        [path addLineToPoint:CGPointMake(2*startPoint.x-currentPoint.x, currentPoint.y)];
+        [path closePath];
+        _currentPath = path;
+        
+        if (_drawingState == UkeDrawingStateStart) {
+            CAShapeLayer *layer = [[CAShapeLayer alloc] init];
+            layer.backgroundColor = [UIColor clearColor].CGColor;
+            layer.fillColor = [UIColor clearColor].CGColor;
+            layer.strokeColor = [UIColor redColor].CGColor;
+            layer.frame = self.frame;
+            [self.layer addSublayer:layer];
+            
+            _currentLayer = layer;
+        }else if (_drawingState == UkeDrawingStateEnd) {
+            UkePathInfo *pathInfo = [[UkePathInfo alloc] init];
+            pathInfo.path = _currentPath;
+            pathInfo.blendMode = kCGBlendModeNormal;
+            
+            [_paths addObject:pathInfo];
+        }
+        
+        _currentLayer.path = _currentPath.CGPath;
     }
 }
     
