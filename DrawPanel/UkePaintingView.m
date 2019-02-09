@@ -26,6 +26,19 @@
     return self;
 }
 
+- (UIImage *)currentContents {
+    UIGraphicsBeginImageContextWithOptions(self.frame.size, NO, [UIScreen mainScreen].scale);
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    [self.layer renderInContext:context];
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return image;
+}
+
+- (void)setCurrentContents:(UIImage *)currentContents {
+    self.layer.contents = (id)currentContents.CGImage;
+}
+
 - (void)drawWithStartPoint:(CGPoint)startPoint currentPoint:(CGPoint)currentPoint {
     if (_currentDrawingMode == UkeDrawingModeLine) { //! 画曲线
         if (_drawingState == UkeDrawingStateStart) {
@@ -147,10 +160,6 @@
             UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
             self.layer.contents = (id)image.CGImage;
             UIGraphicsEndImageContext();
-            
-            if (_drawingState == UkeDrawingStateEnd) {
-
-            }
         }
     }else if (_currentDrawingMode == UkeDrawingModeEraserRectangle) { //! 框选删除
         UIBezierPath *path = [UIBezierPath bezierPathWithRect:CGRectMake(startPoint.x, startPoint.y, currentPoint.x-startPoint.x, currentPoint.y-startPoint.y)];

@@ -70,12 +70,12 @@
     return drawingState;
 }
 
-- (NSArray<CAShapeLayer *> *)currentStrokes {
-    return _paintingView.currentStrokes;
+- (UIImage *)currentContents {
+    return _paintingView.currentContents;
 }
 
-- (void)setCurrentStrokes:(NSArray<CAShapeLayer *> *)currentStrokes {
-    [_paintingView setCurrentStrokes:currentStrokes];
+- (void)setCurrentContents:(UIImage *)currentContents {
+    [_paintingView setCurrentContents:currentContents];
 }
 
 - (void)dealloc {

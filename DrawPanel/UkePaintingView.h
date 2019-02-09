@@ -17,7 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) UkeDrawingState drawingState;
 
 //! 当前绘画内容
-@property (nonatomic, strong) NSArray<CAShapeLayer *> *currentStrokes;
+@property (nonatomic, strong) UIImage *currentContents;
 
 - (void)drawWithStartPoint:(CGPoint)startPoint
               currentPoint:(CGPoint)currentPoint;
