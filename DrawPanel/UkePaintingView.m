@@ -228,5 +228,9 @@
         _currentLayer.path = _currentPath.CGPath;
     }
 }
+
+- (void)setPoints:(CGPoint *)points {
+    
+}
     
 @end

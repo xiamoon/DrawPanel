@@ -39,11 +39,7 @@
     }
 }
 
-- (void)setCurrentDrawingMode:(UkeDrawingMode)currentDrawingMode {
-    _currentDrawingMode = currentDrawingMode;
-    _paintingView.currentDrawingMode = currentDrawingMode;
-}
-
+// 手势驱动绘画
 - (void)handlePanGesture:(UIGestureRecognizer *)pan {
     CGPoint point = [pan locationInView:self];
     
@@ -52,9 +48,32 @@
     }
     CGPoint currentPoint = point;
     
-    [_paintingView setDrawingState:[self drawingStateFromGestureState:pan.state]];
-    [_paintingView drawWithStartPoint:_startPoint currentPoint:currentPoint];
+    [self setCurrentDrawingState:[self drawingStateFromGestureState:pan.state]];
+    [self setPointWithStartPoint:_startPoint currentPoint:currentPoint];
 }
+
+- (void)setCurrentDrawingState:(UkeDrawingState)state {
+    [_paintingView setDrawingState:state];
+}
+
+- (void)setPointWithStartPoint:(CGPoint)startPoint
+                            currentPoint:(CGPoint)currentPoint {
+    [_paintingView drawWithStartPoint:startPoint currentPoint:currentPoint];
+}
+
+- (void)setCurrentDrawingMode:(UkeDrawingMode)currentDrawingMode {
+    _currentDrawingMode = currentDrawingMode;
+    _paintingView.currentDrawingMode = currentDrawingMode;
+}
+
+- (UIImage *)currentContents {
+    return _paintingView.currentContents;
+}
+
+- (void)setCurrentContents:(UIImage *)currentContents {
+    [_paintingView setCurrentContents:currentContents];
+}
+
 
 - (UkeDrawingState)drawingStateFromGestureState:(UIGestureRecognizerState)state {
     UkeDrawingState drawingState = UkeDrawingStateUnknown;
@@ -70,16 +89,8 @@
     return drawingState;
 }
 
-- (UIImage *)currentContents {
-    return _paintingView.currentContents;
-}
-
-- (void)setCurrentContents:(UIImage *)currentContents {
-    [_paintingView setCurrentContents:currentContents];
-}
-
 - (void)dealloc {
-    NSLog(@"canvas销毁");
+    NSLog(@"手绘板canvas销毁");
 }
 
 @end

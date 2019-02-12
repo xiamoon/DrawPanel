@@ -17,6 +17,9 @@ NS_ASSUME_NONNULL_BEGIN
 //! 当前绘画内容
 @property (nonatomic, strong) UIImage *currentContents;
 
+
+- (void)setDrawingMode:(UkeDrawingMode)mode points:(CGPoint *)points drawingState:(UkeDrawingState)state;
+
 @end
 
 NS_ASSUME_NONNULL_END
