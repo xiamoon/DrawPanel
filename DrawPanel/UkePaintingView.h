@@ -22,6 +22,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)drawWithStartPoint:(CGPoint)startPoint
               currentPoint:(CGPoint)currentPoint;
 
+
+- (void)drawWithPoints:(NSArray<NSValue *> *)points
+                 width:(CGFloat)width
+                 color:(UIColor *)color;
+
 @end
 
 NS_ASSUME_NONNULL_END

@@ -28,6 +28,26 @@
         
         UIPanGestureRecognizer *pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePanGesture:)];
         [self addGestureRecognizer:pan];
+        
+        // 真实数据测试画线
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            NSArray *points = @[[NSValue valueWithCGPoint:CGPointMake(287.5,272.5)],
+                                [NSValue valueWithCGPoint:CGPointMake(288.33333333333337,272.5)],
+                                [NSValue valueWithCGPoint:CGPointMake(290,273.33333333333337)],
+                                [NSValue valueWithCGPoint:CGPointMake(292.5,274.1666666666667)],
+                                [NSValue valueWithCGPoint:CGPointMake(296.6666666666667,276.6666666666667)],
+                                [NSValue valueWithCGPoint:CGPointMake(300,278.33333333333337)],
+                                [NSValue valueWithCGPoint:CGPointMake(303.33333333333337,280)],
+                                [NSValue valueWithCGPoint:CGPointMake(306.6666666666667,281.6666666666667)],
+                                [NSValue valueWithCGPoint:CGPointMake(309.1666666666667,281.6666666666667)],
+                                [NSValue valueWithCGPoint:CGPointMake(312.5,282.5)],
+                                [NSValue valueWithCGPoint:CGPointMake(313.33333333333337,282.5)],
+                                [NSValue valueWithCGPoint:CGPointMake(315,283.33333333333337)],
+                                [NSValue valueWithCGPoint:CGPointMake(316.6666666666667,284.1666666666667)],
+                                [NSValue valueWithCGPoint:CGPointMake(316.6666666666667,284.1666666666667)]];
+            [self.paintingView setDrawingState:UkeDrawingStateEnd];
+            [self.paintingView drawWithPoints:points width:2 color:[UIColor redColor]];
+        });
     }
     return self;
 }

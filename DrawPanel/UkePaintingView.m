@@ -229,8 +229,39 @@
     }
 }
 
-- (void)setPoints:(CGPoint *)points {
-    
+- (void)drawWithPoints:(NSArray<NSValue *> *)points width:(CGFloat)width color:(UIColor *)color {
+    CGPoint startPoint = [points[0] CGPointValue];
+    if (_currentDrawingMode == UkeDrawingModeLine) {
+        
+        if (_drawingState == UkeDrawingStateEnd) {
+            CAShapeLayer *layer = [[CAShapeLayer alloc] init];
+            layer.backgroundColor = [UIColor clearColor].CGColor;
+            layer.fillColor = [UIColor clearColor].CGColor;
+            layer.strokeColor = color.CGColor;
+            layer.frame = self.frame;
+            layer.lineWidth = width;
+            [self.layer addSublayer:layer];
+            
+            UIBezierPath *path = [UIBezierPath bezierPath];
+            [path moveToPoint:startPoint];
+            
+            UkePathInfo *pathInfo = [[UkePathInfo alloc] init];
+            pathInfo.path = path;
+            pathInfo.lineWidth = width;
+            pathInfo.lineColor = color;
+            pathInfo.blendMode = kCGBlendModeNormal;
+            
+            _currentLayer = layer;
+            _currentPath = path;
+            [_paths addObject:pathInfo];
+            
+            for (int i = 1; i < points.count; i ++) {
+                CGPoint currentPoint = [points[i] CGPointValue];
+                [_currentPath addLineToPoint:currentPoint];
+            }
+            _currentLayer.path = _currentPath.CGPath;
+        }
+    }
 }
     
 @end
