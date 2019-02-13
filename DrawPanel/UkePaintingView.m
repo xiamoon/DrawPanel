@@ -10,7 +10,9 @@
 #import "UkePathInfo.h"
 
 @interface UkePaintingView ()
+@property (nonatomic, assign) CGPoint startPoint;
 @property (nonatomic, strong) UIBezierPath *currentPath;
+@property (nonatomic, strong) UkePathInfo *currentPathInfo;
 @property (nonatomic, strong) CAShapeLayer *currentLayer;
 @property (nonatomic, strong) NSMutableArray<UkePathInfo *> *paths;
 @end
@@ -40,7 +42,7 @@
 }
 
 - (void)drawWithStartPoint:(CGPoint)startPoint currentPoint:(CGPoint)currentPoint {
-    if (_currentDrawingMode == UkeDrawingModeLine) { //! 画曲线
+    if (_currentDrawingMode == UkeDrawingModeBrush) { //! 画曲线
         if (_drawingState == UkeDrawingStateStart) {
             CAShapeLayer *layer = [[CAShapeLayer alloc] init];
             layer.backgroundColor = [UIColor clearColor].CGColor;
@@ -63,7 +65,7 @@
             [_currentPath addLineToPoint:currentPoint];
             _currentLayer.path = _currentPath.CGPath;
         }
-    }else if (_currentDrawingMode == UkeDrawingModeSegment) { //! 画线段
+    }else if (_currentDrawingMode == UkeDrawingModeLine) { //! 画线段
         UIBezierPath *path = [UIBezierPath bezierPath];
         [path moveToPoint:startPoint];
         [path addLineToPoint:currentPoint];
@@ -230,31 +232,65 @@
 }
 
 
-- (void)drawWithStartPoint:(NSValue *)startPoint
-               otherPoints:(NSArray<NSValue *> *)points
-                     width:(CGFloat)width
-                     color:(UIColor *)color
-              drawingState:(UkeDrawingState)state {
-    if (!_currentLayer || !_currentPath) {
-        [self createStartDataWithWidth:width color:color startPoint:startPoint];
+- (void)drawWithMode:(UkeDrawingMode)drawingMode
+          startPoint:(NSValue *)startPoint
+         otherPoints:(NSArray<NSValue *> *)points
+               width:(CGFloat)width
+               color:(UIColor *)color
+        drawingState:(UkeDrawingState)state {
+    if (drawingMode != UkeDrawingModeUnKnown) {
+        _currentDrawingMode = drawingMode;
     }
     
-    if (points.count) {
-        for (int i = 0; i < points.count; i ++) {
-            CGPoint currentPoint = [points[i] CGPointValue];
-            [_currentPath addLineToPoint:currentPoint];
+    _drawingState = state;
+    if (startPoint && points.count == 0) {
+        _drawingState = UkeDrawingStateStart;
+    }
+    
+    if (_currentDrawingMode == UkeDrawingModeBrush) { // 线
+        if (!_currentLayer || !_currentPath) {
+            [self createLayerWithWidth:width color:color startPoint:startPoint];
+            UIBezierPath *path = [UIBezierPath bezierPath];
+            [path moveToPoint:startPoint.CGPointValue];
+            _currentPath = path;
         }
+        
+        if (points.count) {
+            for (int i = 0; i < points.count; i ++) {
+                CGPoint currentPoint = [points[i] CGPointValue];
+                [_currentPath addLineToPoint:currentPoint];
+            }
+        }
+        _currentLayer.path = _currentPath.CGPath;
+    }else if (_currentDrawingMode == UkeDrawingModeEllipse) { // 椭圆
+        if (startPoint) {
+            _startPoint = startPoint.CGPointValue;
+        }
+        
+        if (!_currentLayer) {
+            [self createLayerWithWidth:width color:color startPoint:startPoint];
+        }
+        
+        if (points.count) {
+            for (int i = 0; i < points.count; i ++) {
+                CGPoint currentPoint = [points[i] CGPointValue];
+                UIBezierPath *path = [UIBezierPath bezierPathWithOvalInRect:CGRectMake(_startPoint.x, _startPoint.y, currentPoint.x-_startPoint.x, currentPoint.y-_startPoint.y)];
+                _currentPath = path;
+            }
+        }
+        
         _currentLayer.path = _currentPath.CGPath;
     }
     
-    if (state == UkeDrawingStateEnd) {
+    
+    if (_drawingState == UkeDrawingStateEnd) {
         _currentLayer = nil;
         _currentPath = nil;
     }
 }
 
 
-- (void)createStartDataWithWidth:(CGFloat)width
+- (void)createLayerWithWidth:(CGFloat)width
                                       color:(UIColor *)color
                                  startPoint:(NSValue *)startPoint {
     CAShapeLayer *layer = [[CAShapeLayer alloc] init];
@@ -265,18 +301,15 @@
     layer.lineWidth = width;
     [self.layer addSublayer:layer];
     
-    UIBezierPath *path = [UIBezierPath bezierPath];
-    [path moveToPoint:startPoint.CGPointValue];
-    
     _currentLayer = layer;
-    _currentPath = path;
-    
-    UkePathInfo *pathInfo = [[UkePathInfo alloc] init];
-    pathInfo.path = path;
-    pathInfo.lineWidth = width;
-    pathInfo.lineColor = color;
-    pathInfo.blendMode = kCGBlendModeNormal;
-    [_paths addObject:pathInfo];
+//
+//    UkePathInfo *pathInfo = [[UkePathInfo alloc] init];
+//    pathInfo.lineWidth = width;
+//    pathInfo.lineColor = color;
+//    pathInfo.blendMode = kCGBlendModeNormal;
+//    [_paths addObject:pathInfo];
+//
+//    _currentPathInfo = pathInfo;
 }
 
 
@@ -285,7 +318,7 @@
 
 - (void)drawWithPoints:(NSArray<NSValue *> *)points width:(CGFloat)width color:(UIColor *)color  {
     CGPoint startPoint = [points[0] CGPointValue];
-    if (_currentDrawingMode == UkeDrawingModeLine) {
+    if (_currentDrawingMode == UkeDrawingModeBrush) {
         
         if (_drawingState == UkeDrawingStateEnd) {
             CAShapeLayer *layer = [[CAShapeLayer alloc] init];

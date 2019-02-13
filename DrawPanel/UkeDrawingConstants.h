@@ -28,8 +28,9 @@
 #endif
 
 typedef NS_ENUM(NSInteger, UkeDrawingMode) {
-    UkeDrawingModeLine = 0, //! 线
-    UkeDrawingModeSegment, //! 线段
+    UkeDrawingModeUnKnown = -1,
+    UkeDrawingModeBrush = 0, //! 线
+    UkeDrawingModeLine, //! 线段
     UkeDrawingModeEllipse, //! 椭圆
     UkeDrawingModeRectangle, //! 矩形框
     UkeDrawingModeWords, //! 文字
@@ -37,6 +38,7 @@ typedef NS_ENUM(NSInteger, UkeDrawingMode) {
     UkeDrawingModeEraserRectangle, //! 框选删除
     UkeDrawingModeEraserArrow, //! 箭头
     UkeDrawingModeTriangle, //! 三角形
+    UkeDrawingModeStar, //! 五角星
 };
 
 typedef NS_ENUM(NSInteger, UkeDrawingState) {

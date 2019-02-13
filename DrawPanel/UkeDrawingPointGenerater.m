@@ -47,9 +47,99 @@
     return points.copy;
 }
 
-+ (NSArray *)allDrawTypes {
-    return @[@"brush", @"eraser", @"ellipse", @"rectangle", @"triangle", @"star", @"line", @"linearrow", @"texttool", @"eraserrectangle"];
++ (NSArray<NSArray *> *)ellipsePoints1 {
+    NSMutableArray *points = [NSMutableArray array];
+    NSArray *start = @[@"252.5",@"130.83333333333334",@"14",@"ellipse",@[@"2",@"0",@"#EF4C4F",@"0"]];
+    
+    NSArray *point1 = @[@"254.16666666666669",@"133.33333333333334",@"14"];
+    NSArray *point2 = @[@"255.83333333333334",@"138.33333333333334",@"14"];
+    NSArray *point3 = @[@"260",@"141",@"14"];
+    NSArray *point4 = @[@"263",@"144",@"14"];
+    NSArray *point5 = @[@"267",@"148",@"14"];
+    NSArray *point6 = @[@"270",@"153",@"14"];
+    NSArray *point7 = @[@"273",@"157",@"14"];
+    NSArray *point8 = @[@"277",@"159",@"14"];
+    NSArray *point9 = @[@"278",@"163",@"14"];
+    NSArray *point10 = @[@"282",@"166",@"14"];
+    NSArray *point11 = @[@"283",@"168",@"14"];
+    NSArray *point12 = @[@"285",@"168",@"14"];
+    NSArray *point13 = @[@"293",@"180",@"14"];
+
+    [points addObject:start];
+    [points addObject:point1];
+    [points addObject:point2];
+    [points addObject:point3];
+    [points addObject:point4];
+    [points addObject:point5];
+    [points addObject:point6];
+    [points addObject:point7];
+    [points addObject:point8];
+    [points addObject:point9];
+    [points addObject:point10];
+    [points addObject:point11];
+    [points addObject:point12];
+    [points addObject:point13];
+    
+    return points.copy;
 }
 
++ (NSArray<NSArray *> *)ellipsePoints2 {
+    NSMutableArray *points = [NSMutableArray array];
+    
+    NSArray *point1 = @[@"295",@"182",@"14"];
+    NSArray *point2 = @[@"297",@"183",@"14"];
+    NSArray *point3 = @[@"297",@"184",@"14"];
+    NSArray *point4 = @[@"298",@"186",@"14"];
+    NSArray *point5 = @[@"299",@"186",@"14"];
+    NSArray *point6 = @[@"302",@"190",@"14"];
+    
+    [points addObject:point1];
+    [points addObject:point2];
+    [points addObject:point3];
+    [points addObject:point4];
+    [points addObject:point5];
+    [points addObject:point6];
+    
+    return points.copy;
+}
+
++ (NSArray<NSArray *> *)ellipsePoints3 {
+    NSMutableArray *points = [NSMutableArray array];
+    NSArray *point1 = @[@"317",@"202",@"14"];
+    [points addObject:point1];
+    return points.copy;
+}
+
++ (NSArray<NSArray *> *)ellipsePoints4 {
+    NSMutableArray *points = [NSMutableArray array];
+    
+    NSArray *point1 = @[@"317",@"202",@"14"];
+    NSArray *point2 = @[@"320",@"202",@"14"];
+    NSArray *point3 = @[@"322",@"202",@"14"];
+    NSArray *point4 = @[@"326",@"202",@"14"];
+    NSArray *point5 = @[@"339",@"202",@"14"];
+    NSArray *point6 = @[@"345",@"202",@"14"];
+    
+    [points addObject:point1];
+    [points addObject:point2];
+    [points addObject:point3];
+    [points addObject:point4];
+    [points addObject:point5];
+    [points addObject:point6];
+    
+    return points.copy;
+}
+
++ (NSArray<NSArray *> *)ellipsePoints5 {
+    NSMutableArray *points = [NSMutableArray array];
+    NSArray *end = @[@"345",@"202",@"14",@"true"];
+    [points addObject:end];
+    return points.copy;
+}
+
+
++ (NSArray *)allDrawTypes {
+    return @[@"brush", @"line", @"ellipse", @"rectangle", @"texttool", @"eraser", @"eraserrectangle", @"linearrow", @"triangle", @"star"];
+}
 
 @end

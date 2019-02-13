@@ -25,7 +25,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 //! 服务端数据驱动绘制时调用这个接口
-- (void)drawWithStartPoint:(NSValue *)startPoint
+- (void)drawWithMode:(UkeDrawingMode)drawingMode
+          startPoint:(NSValue *)startPoint
                otherPoints:(NSArray<NSValue *> *)points
                      width:(CGFloat)width
                      color:(UIColor *)color

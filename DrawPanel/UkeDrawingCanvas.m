@@ -32,13 +32,21 @@
         
         // 真实数据测试画线
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [self generateAndParseLinePoints];
+            // 测试画线
+//            [self drawLineWithPoints:[UkeDrawingPointGenerater linePoints]];
+            
+            // 测试画圆
+            [self testDrawWithPoints:[UkeDrawingPointGenerater ellipsePoints1]];
+            [self testDrawWithPoints:[UkeDrawingPointGenerater ellipsePoints2]];
+            [self testDrawWithPoints:[UkeDrawingPointGenerater ellipsePoints3]];
+            [self testDrawWithPoints:[UkeDrawingPointGenerater ellipsePoints4]];
+            [self testDrawWithPoints:[UkeDrawingPointGenerater ellipsePoints5]];
         });
     }
     return self;
 }
 
-- (void)generateAndParseLinePoints {
+- (void)testDrawWithPoints:(NSArray<NSArray *> *)points {
     
     NSMutableArray<NSValue *> *drawingPoints = [NSMutableArray array];
     
@@ -48,30 +56,7 @@
     __block NSValue *startPoint = nil;
     __block NSString *terminalFlag = nil;
     
-    NSArray<NSArray *> *points = [UkeDrawingPointGenerater linePoints];
     [points enumerateObjectsUsingBlock:^(NSArray *singlePoint, NSUInteger index, BOOL * _Nonnull stop) {
-//        if (singlePoint.count >= 5) { // 一定为起始点数据
-//            action = singlePoint[2];
-//            drawType = singlePoint[3];
-//            drawInfo = singlePoint[4];
-//            startPoint = [NSValue valueWithCGPoint:CGPointMake([singlePoint[0] floatValue], [singlePoint[1] floatValue])];
-//            if (singlePoint.count > 5) { // 一定既然起点又是终点数据
-//                terminalFlag = singlePoint[5];
-//                if ([drawType isEqualToString:@"triangle"]) { // 三角形
-//
-//                }else if ([drawType isEqualToString:@"linearrow"]) { // 箭头
-//
-//                }else if ([drawType isEqualToString:@"texttool"]) { // 文字
-//
-//                }
-//            }
-//        }else if (singlePoint.count == 3) { // 一定为中间点数据
-//            NSValue *middlePoint = [NSValue valueWithCGPoint:CGPointMake([singlePoint[0] floatValue], [singlePoint[1] floatValue])];
-//        }else if (singlePoint.count == 4) { // 一定为结束点数据
-//            terminalFlag = singlePoint[3];
-//            NSValue *middlePoint = [NSValue valueWithCGPoint:CGPointMake([singlePoint[0] floatValue], [singlePoint[1] floatValue])];
-//        }
-        
         
         if (singlePoint.count >= 3) {
             action = singlePoint[2];
@@ -120,13 +105,21 @@
         if (drawInfo.count >= 2) {
             width = [drawInfo[0] floatValue];
             NSString *hex = drawInfo[1];
+            if ([drawType isEqualToString:[UkeDrawingPointGenerater allDrawTypes][2]]) { // 圆
+                hex = drawInfo[2];
+            }
             hex = [hex substringFromIndex:1];
             NSInteger _hex = [self numberWithHexString:hex];
             color = UIColorHex(_hex);
         }
     }
     
-    [_paintingView drawWithStartPoint:startPoint otherPoints:drawingPoints width:width color:color drawingState:terminalFlag?UkeDrawingStateEnd:UkeDrawingStateDrawing];
+    UkeDrawingMode drawingMode = UkeDrawingModeUnKnown;
+    if (drawType) {
+        drawingMode = (UkeDrawingMode)[[UkeDrawingPointGenerater allDrawTypes] indexOfObject:drawType];
+    }
+    
+    [_paintingView drawWithMode:drawingMode startPoint:startPoint otherPoints:drawingPoints width:width color:color drawingState:terminalFlag?UkeDrawingStateEnd:UkeDrawingStateDrawing];
 }
 
 
