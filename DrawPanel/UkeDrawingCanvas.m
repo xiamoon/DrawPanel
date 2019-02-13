@@ -8,6 +8,7 @@
 
 #import "UkeDrawingCanvas.h"
 #import "UkePaintingView.h"
+#import "UkeDrawingPointGenerater.h"
 
 @interface UkeDrawingCanvas ()
 //! 绘画展示的layer
@@ -30,27 +31,112 @@
         [self addGestureRecognizer:pan];
         
         // 真实数据测试画线
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            NSArray *points = @[[NSValue valueWithCGPoint:CGPointMake(287.5,272.5)],
-                                [NSValue valueWithCGPoint:CGPointMake(288.33333333333337,272.5)],
-                                [NSValue valueWithCGPoint:CGPointMake(290,273.33333333333337)],
-                                [NSValue valueWithCGPoint:CGPointMake(292.5,274.1666666666667)],
-                                [NSValue valueWithCGPoint:CGPointMake(296.6666666666667,276.6666666666667)],
-                                [NSValue valueWithCGPoint:CGPointMake(300,278.33333333333337)],
-                                [NSValue valueWithCGPoint:CGPointMake(303.33333333333337,280)],
-                                [NSValue valueWithCGPoint:CGPointMake(306.6666666666667,281.6666666666667)],
-                                [NSValue valueWithCGPoint:CGPointMake(309.1666666666667,281.6666666666667)],
-                                [NSValue valueWithCGPoint:CGPointMake(312.5,282.5)],
-                                [NSValue valueWithCGPoint:CGPointMake(313.33333333333337,282.5)],
-                                [NSValue valueWithCGPoint:CGPointMake(315,283.33333333333337)],
-                                [NSValue valueWithCGPoint:CGPointMake(316.6666666666667,284.1666666666667)],
-                                [NSValue valueWithCGPoint:CGPointMake(316.6666666666667,284.1666666666667)]];
-            [self.paintingView setDrawingState:UkeDrawingStateEnd];
-            [self.paintingView drawWithPoints:points width:2 color:[UIColor redColor]];
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [self generateAndParseLinePoints];
         });
     }
     return self;
 }
+
+- (void)generateAndParseLinePoints {
+    
+    NSMutableArray<NSValue *> *drawingPoints = [NSMutableArray array];
+    
+    __block NSString *action = nil;
+    __block NSString *drawType = nil;
+    __block NSArray *drawInfo = nil; // 画笔信息，如粗细，颜色等
+    __block NSValue *startPoint = nil;
+    __block NSString *terminalFlag = nil;
+    
+    NSArray<NSArray *> *points = [UkeDrawingPointGenerater linePoints];
+    [points enumerateObjectsUsingBlock:^(NSArray *singlePoint, NSUInteger index, BOOL * _Nonnull stop) {
+//        if (singlePoint.count >= 5) { // 一定为起始点数据
+//            action = singlePoint[2];
+//            drawType = singlePoint[3];
+//            drawInfo = singlePoint[4];
+//            startPoint = [NSValue valueWithCGPoint:CGPointMake([singlePoint[0] floatValue], [singlePoint[1] floatValue])];
+//            if (singlePoint.count > 5) { // 一定既然起点又是终点数据
+//                terminalFlag = singlePoint[5];
+//                if ([drawType isEqualToString:@"triangle"]) { // 三角形
+//
+//                }else if ([drawType isEqualToString:@"linearrow"]) { // 箭头
+//
+//                }else if ([drawType isEqualToString:@"texttool"]) { // 文字
+//
+//                }
+//            }
+//        }else if (singlePoint.count == 3) { // 一定为中间点数据
+//            NSValue *middlePoint = [NSValue valueWithCGPoint:CGPointMake([singlePoint[0] floatValue], [singlePoint[1] floatValue])];
+//        }else if (singlePoint.count == 4) { // 一定为结束点数据
+//            terminalFlag = singlePoint[3];
+//            NSValue *middlePoint = [NSValue valueWithCGPoint:CGPointMake([singlePoint[0] floatValue], [singlePoint[1] floatValue])];
+//        }
+        
+        
+        if (singlePoint.count >= 3) {
+            action = singlePoint[2];
+        }
+        
+        if (singlePoint.count <= 3) { // 中间点数据
+            if (singlePoint.count >= 2) {
+                NSValue *point = [NSValue valueWithCGPoint:CGPointMake([singlePoint[0] floatValue], [singlePoint[1] floatValue])];
+                [drawingPoints addObject:point];
+            }
+        }else {
+            drawType = singlePoint[3];
+            if ([[UkeDrawingPointGenerater allDrawTypes] containsObject:drawType]) { // 起始点数据
+                NSValue *point = [NSValue valueWithCGPoint:CGPointMake([singlePoint[0] floatValue], [singlePoint[1] floatValue])];
+                startPoint = point;
+                
+                if (singlePoint.count >= 5) {
+                    drawInfo = singlePoint[4];
+                }
+                
+                if (singlePoint.count >= 6) {
+                    terminalFlag = singlePoint[5];
+                    if ([terminalFlag isEqualToString:@"true"]) { // 终止点数据
+                        NSValue *point = [NSValue valueWithCGPoint:CGPointMake([singlePoint[0] floatValue], [singlePoint[1] floatValue])];
+                        [drawingPoints addObject:point];
+                    }else {
+                        terminalFlag = nil;
+                    }
+                }
+            }else {
+                terminalFlag = singlePoint[3];
+                if ([terminalFlag isEqualToString:@"true"]) { // 终止点数据
+                    NSValue *point = [NSValue valueWithCGPoint:CGPointMake([singlePoint[0] floatValue], [singlePoint[1] floatValue])];
+                    [drawingPoints addObject:point];
+                }else {
+                    terminalFlag = nil;
+                }
+            }
+        }
+    }];
+    
+    
+    CGFloat width = 0;
+    UIColor *color = nil;
+    if (drawInfo) {
+        if (drawInfo.count >= 2) {
+            width = [drawInfo[0] floatValue];
+            NSString *hex = drawInfo[1];
+            hex = [hex substringFromIndex:1];
+            NSInteger _hex = [self numberWithHexString:hex];
+            color = UIColorHex(_hex);
+        }
+    }
+    
+    [_paintingView drawWithStartPoint:startPoint otherPoints:drawingPoints width:width color:color drawingState:terminalFlag?UkeDrawingStateEnd:UkeDrawingStateDrawing];
+}
+
+
+- (NSInteger)numberWithHexString:(NSString *)hexString{
+    const char *hexChar = [hexString cStringUsingEncoding:NSUTF8StringEncoding];
+    int hexNumber;
+    sscanf(hexChar, "%x", &hexNumber);
+    return (NSInteger)hexNumber;
+}
+
 
 - (void)willMoveToSuperview:(UIView *)newSuperview {
     [super willMoveToSuperview:newSuperview];

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		547001EE2213E97500B58EBE /* UkeDrawingPointGenerater.m in Sources */ = {isa = PBXBuildFile; fileRef = 547001ED2213E97500B58EBE /* UkeDrawingPointGenerater.m */; };
 		54A3360821FC11DB00B7AD5C /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 54A3360721FC11DB00B7AD5C /* AppDelegate.m */; };
 		54A3360B21FC11DB00B7AD5C /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 54A3360A21FC11DB00B7AD5C /* ViewController.m */; };
 		54A3360E21FC11DB00B7AD5C /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 54A3360C21FC11DB00B7AD5C /* Main.storyboard */; };
@@ -40,6 +41,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		547001EC2213E97500B58EBE /* UkeDrawingPointGenerater.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UkeDrawingPointGenerater.h; sourceTree = "<group>"; };
+		547001ED2213E97500B58EBE /* UkeDrawingPointGenerater.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UkeDrawingPointGenerater.m; sourceTree = "<group>"; };
 		54A3360321FC11DB00B7AD5C /* DrawPanel.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DrawPanel.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		54A3360621FC11DB00B7AD5C /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		54A3360721FC11DB00B7AD5C /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -129,6 +132,8 @@
 				54DCDF012202CE0900B48C8B /* UkePaintingView.m */,
 				54DCDF032202E23600B48C8B /* UkePathInfo.h */,
 				54DCDF042202E23600B48C8B /* UkePathInfo.m */,
+				547001EC2213E97500B58EBE /* UkeDrawingPointGenerater.h */,
+				547001ED2213E97500B58EBE /* UkeDrawingPointGenerater.m */,
 				54A3360C21FC11DB00B7AD5C /* Main.storyboard */,
 				54A3360F21FC11DD00B7AD5C /* Assets.xcassets */,
 				54A3361121FC11DD00B7AD5C /* LaunchScreen.storyboard */,
@@ -293,6 +298,7 @@
 				54A3363A21FC120E00B7AD5C /* UkeDrawingDisplayPanel.m in Sources */,
 				54A3363D21FC67DB00B7AD5C /* UkeDrawingCanvas.m in Sources */,
 				54DCDF052202E23600B48C8B /* UkePathInfo.m in Sources */,
+				547001EE2213E97500B58EBE /* UkeDrawingPointGenerater.m in Sources */,
 				54DCDF022202CE0900B48C8B /* UkePaintingView.m in Sources */,
 				54A3360821FC11DB00B7AD5C /* AppDelegate.m in Sources */,
 			);
