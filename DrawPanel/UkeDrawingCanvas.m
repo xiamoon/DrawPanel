@@ -9,8 +9,10 @@
 #import "UkeDrawingCanvas.h"
 #import "UkePaintingView.h"
 #import "UkeDrawingPointGenerater.h"
+#import "UkeDrawingPointParser.h"
 
 @interface UkeDrawingCanvas ()
+@property (nonatomic, strong) UkeDrawingPointParser *pointParser;
 //! 绘画展示的layer
 @property (nonatomic, strong) UkePaintingView *paintingView;
 //! 绘画起始点
@@ -24,6 +26,8 @@
     if (self) {
         self.backgroundColor = [UIColor clearColor];
         
+        _pointParser = [[UkeDrawingPointParser alloc] init];
+        
         _paintingView = [[UkePaintingView alloc] init];
         [self addSubview:_paintingView];
         
@@ -36,100 +40,28 @@
 //            [self drawLineWithPoints:[UkeDrawingPointGenerater linePoints]];
             
             // 测试画圆
+            
             [self testDrawWithPoints:[UkeDrawingPointGenerater ellipsePoints1]];
+        });
+        
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             [self testDrawWithPoints:[UkeDrawingPointGenerater ellipsePoints2]];
+        });
+        
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             [self testDrawWithPoints:[UkeDrawingPointGenerater ellipsePoints3]];
+        });
+        
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(4.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             [self testDrawWithPoints:[UkeDrawingPointGenerater ellipsePoints4]];
+        });
+        
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(4.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             [self testDrawWithPoints:[UkeDrawingPointGenerater ellipsePoints5]];
         });
     }
     return self;
 }
-
-- (void)testDrawWithPoints:(NSArray<NSArray *> *)points {
-    
-    NSMutableArray<NSValue *> *drawingPoints = [NSMutableArray array];
-    
-    __block NSString *action = nil;
-    __block NSString *drawType = nil;
-    __block NSArray *drawInfo = nil; // 画笔信息，如粗细，颜色等
-    __block NSValue *startPoint = nil;
-    __block NSString *terminalFlag = nil;
-    
-    [points enumerateObjectsUsingBlock:^(NSArray *singlePoint, NSUInteger index, BOOL * _Nonnull stop) {
-        
-        if (singlePoint.count >= 3) {
-            action = singlePoint[2];
-        }
-        
-        if (singlePoint.count <= 3) { // 中间点数据
-            if (singlePoint.count >= 2) {
-                NSValue *point = [NSValue valueWithCGPoint:CGPointMake([singlePoint[0] floatValue], [singlePoint[1] floatValue])];
-                [drawingPoints addObject:point];
-            }
-        }else {
-            drawType = singlePoint[3];
-            if ([[UkeDrawingPointGenerater allDrawTypes] containsObject:drawType]) { // 起始点数据
-                NSValue *point = [NSValue valueWithCGPoint:CGPointMake([singlePoint[0] floatValue], [singlePoint[1] floatValue])];
-                startPoint = point;
-                
-                if (singlePoint.count >= 5) {
-                    drawInfo = singlePoint[4];
-                }
-                
-                if (singlePoint.count >= 6) {
-                    terminalFlag = singlePoint[5];
-                    if ([terminalFlag isEqualToString:@"true"]) { // 终止点数据
-                        NSValue *point = [NSValue valueWithCGPoint:CGPointMake([singlePoint[0] floatValue], [singlePoint[1] floatValue])];
-                        [drawingPoints addObject:point];
-                    }else {
-                        terminalFlag = nil;
-                    }
-                }
-            }else {
-                terminalFlag = singlePoint[3];
-                if ([terminalFlag isEqualToString:@"true"]) { // 终止点数据
-                    NSValue *point = [NSValue valueWithCGPoint:CGPointMake([singlePoint[0] floatValue], [singlePoint[1] floatValue])];
-                    [drawingPoints addObject:point];
-                }else {
-                    terminalFlag = nil;
-                }
-            }
-        }
-    }];
-    
-    
-    CGFloat width = 0;
-    UIColor *color = nil;
-    if (drawInfo) {
-        if (drawInfo.count >= 2) {
-            width = [drawInfo[0] floatValue];
-            NSString *hex = drawInfo[1];
-            if ([drawType isEqualToString:[UkeDrawingPointGenerater allDrawTypes][2]]) { // 圆
-                hex = drawInfo[2];
-            }
-            hex = [hex substringFromIndex:1];
-            NSInteger _hex = [self numberWithHexString:hex];
-            color = UIColorHex(_hex);
-        }
-    }
-    
-    UkeDrawingMode drawingMode = UkeDrawingModeUnKnown;
-    if (drawType) {
-        drawingMode = (UkeDrawingMode)[[UkeDrawingPointGenerater allDrawTypes] indexOfObject:drawType];
-    }
-    
-    [_paintingView drawWithMode:drawingMode startPoint:startPoint otherPoints:drawingPoints width:width color:color drawingState:terminalFlag?UkeDrawingStateEnd:UkeDrawingStateDrawing];
-}
-
-
-- (NSInteger)numberWithHexString:(NSString *)hexString{
-    const char *hexChar = [hexString cStringUsingEncoding:NSUTF8StringEncoding];
-    int hexNumber;
-    sscanf(hexChar, "%x", &hexNumber);
-    return (NSInteger)hexNumber;
-}
-
 
 - (void)willMoveToSuperview:(UIView *)newSuperview {
     [super willMoveToSuperview:newSuperview];
@@ -138,7 +70,16 @@
     }
 }
 
-// 手势驱动绘画
+
+
+#pragma mark - 数据点驱动绘画
+- (void)testDrawWithPoints:(NSArray<NSArray *> *)points {
+    [_pointParser parseWithPoints:points];
+    [_paintingView drawWithMode:_pointParser.drawingMode startPoint:_pointParser.startPoint otherPoints:_pointParser.drawingPoints width:_pointParser.lineWidth color:_pointParser.color drawingState:_pointParser.drawingState];
+}
+
+
+#pragma mark - 手势驱动绘画
 - (void)handlePanGesture:(UIGestureRecognizer *)pan {
     CGPoint point = [pan locationInView:self];
     
@@ -172,7 +113,6 @@
 - (void)setCurrentContents:(UIImage *)currentContents {
     [_paintingView setCurrentContents:currentContents];
 }
-
 
 - (UkeDrawingState)drawingStateFromGestureState:(UIGestureRecognizerState)state {
     UkeDrawingState drawingState = UkeDrawingStateUnknown;
