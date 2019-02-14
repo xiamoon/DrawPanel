@@ -58,7 +58,7 @@
     _panel = panel;
     
     [seg setSelectedSegmentIndex:0];
-    [panel switchDrawingMode:UkeDrawingModeBrush];
+    [panel switchDrawingMode:UkeDrawingModeLine];
 }
 
 - (void)handleSegAction:(UISegmentedControl *)seg {

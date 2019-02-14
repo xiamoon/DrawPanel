@@ -35,8 +35,8 @@
         _paintingView = [[UkePaintingView alloc] init];
         [self addSubview:_paintingView];
         
-//        UIPanGestureRecognizer *pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePanGesture:)];
-//        [self addGestureRecognizer:pan];
+        UIPanGestureRecognizer *pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePanGesture:)];
+        [self addGestureRecognizer:pan];
         
         // 画笔
         [self testDrawWithPoints:[UkeDrawingPointGenerater startPoints:UkeDrawingModeLine]];
@@ -101,7 +101,7 @@
 
 
 #pragma mark - 手势驱动绘画
-/*
+
 - (void)handlePanGesture:(UIGestureRecognizer *)pan {
     CGPoint point = [pan locationInView:self];
     
@@ -141,7 +141,6 @@
     }
     return drawingState;
 }
-*/
 
  
 - (void)dealloc {

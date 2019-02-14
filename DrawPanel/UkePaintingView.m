@@ -41,7 +41,83 @@
     self.layer.contents = (id)currentContents.CGImage;
 }
 
+static CGFloat sinForDegree(CGFloat degree) {
+    return sin(degree/180.0*M_PI);
+}
+
+static CGFloat degreeForASin(double a) {
+    CGFloat radian = asin(a);
+    return (radian*180.0/M_PI);
+}
+
+static CGFloat tanForDegree(CGFloat degree) {
+    return tan(degree/180.0*M_PI);
+}
+
+static CGFloat degreeForAtan(double a) {
+    CGFloat radian = atan(a);
+    return (radian*180.0/M_PI);
+}
+
+
 - (void)drawWithStartPoint:(CGPoint)startPoint currentPoint:(CGPoint)currentPoint {
+    UIBezierPath *path = [UIBezierPath bezierPath];
+    [path moveToPoint:startPoint];
+    [path addLineToPoint:currentPoint];
+    _currentPath = path;
+    
+    if (_drawingState == UkeDrawingStateStart) {
+        CAShapeLayer *layer = [[CAShapeLayer alloc] init];
+        layer.backgroundColor = [UIColor clearColor].CGColor;
+        layer.fillColor = [UIColor clearColor].CGColor;
+        layer.strokeColor = [UIColor redColor].CGColor;
+        layer.frame = self.frame;
+        [self.layer addSublayer:layer];
+        
+        _currentLayer = layer;
+    }
+    
+    UIBezierPath *arrowPath = [UIBezierPath bezierPath];
+    [arrowPath moveToPoint:CGPointMake(0, 0)];
+    [arrowPath addLineToPoint:CGPointMake(20, 0)];
+    [arrowPath addLineToPoint:CGPointMake(20, 20)];
+    CAShapeLayer *arrowLayer = _currentLayer.sublayers.firstObject;
+    if (!arrowLayer) {
+        arrowLayer = [[CAShapeLayer alloc] init];
+        arrowLayer.anchorPoint = CGPointMake(1.0, 0);
+        arrowLayer.bounds = CGRectMake(0, 0, 20, 20);
+        arrowLayer.backgroundColor = [UIColor orangeColor].CGColor;
+        arrowLayer.fillColor = [UIColor clearColor].CGColor;
+        arrowLayer.strokeColor = [UIColor redColor].CGColor;
+        [_currentLayer addSublayer:arrowLayer];
+    }
+    arrowLayer.path = arrowPath.CGPath;
+
+    [CATransaction begin];
+    [CATransaction setDisableActions:YES];
+    arrowLayer.position = CGPointMake(currentPoint.x, currentPoint.y);
+    [CATransaction commit];
+    
+    if (!CGPointEqualToPoint(startPoint, currentPoint)) {
+        CGFloat a = currentPoint.x-startPoint.x;
+        CGFloat b = startPoint.y-currentPoint.y;
+        CGFloat degreeA = degreeForASin(a/sqrt(a*a+b*b));
+        CGFloat degreeDelta = degreeA>0 ? (45-degreeA) : -(45-degreeA+90);
+        
+        [CATransaction begin];
+        [CATransaction setDisableActions:YES];
+        [arrowLayer setAffineTransform:CGAffineTransformMakeRotation((360-degreeDelta)/180.0*M_PI)];
+        [CATransaction commit];
+    }
+    
+    _currentLayer.path = _currentPath.CGPath;
+    
+    if (_drawingState == UkeDrawingStateEnd) {
+        CGFloat degreeA = degreeForAtan(-sqrt(3));
+        NSLog(@"---> degreee:%.2f", degreeA);
+    }
+    
+    return;
     if (_currentDrawingMode == UkeDrawingModeBrush) { //! 画曲线
         if (_drawingState == UkeDrawingStateStart) {
             CAShapeLayer *layer = [[CAShapeLayer alloc] init];
