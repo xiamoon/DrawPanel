@@ -23,6 +23,10 @@
     __block NSString *terminalFlag = nil;
     
     [points enumerateObjectsUsingBlock:^(NSArray *singlePoint, NSUInteger index, BOOL * _Nonnull stop) {
+        if (singlePoint.count < 2) {
+            return; // 相当于for循环的continue
+        }
+        
         if (singlePoint.count >= 3) {
             action = singlePoint[2];
         }
@@ -47,11 +51,13 @@
                     if ([terminalFlag isEqualToString:@"true"]) { // 终止点数据
                         if ([drawType isEqualToString:kUkeDrawingAllTypes[8]]) { // 三角形
                             // 三角形的剩下两个点在drawInfo里面
-                            NSValue *point1 = [NSValue valueWithCGPoint:CGPointMake([drawInfo[2] floatValue], [drawInfo[3] floatValue])];
-                            NSValue *point2 = [NSValue valueWithCGPoint:CGPointMake([drawInfo[4] floatValue], [drawInfo[5] floatValue])];
-                            
-                            [drawingPoints addObject:point1];
-                            [drawingPoints addObject:point2];
+                            if (drawInfo.count >= 6) {
+                                NSValue *point1 = [NSValue valueWithCGPoint:CGPointMake([drawInfo[2] floatValue], [drawInfo[3] floatValue])];
+                                NSValue *point2 = [NSValue valueWithCGPoint:CGPointMake([drawInfo[4] floatValue], [drawInfo[5] floatValue])];
+                                
+                                [drawingPoints addObject:point1];
+                                [drawingPoints addObject:point2];
+                            }
                         }else {
                             NSValue *point = [NSValue valueWithCGPoint:CGPointMake([singlePoint[0] floatValue], [singlePoint[1] floatValue])];
                             [drawingPoints addObject:point];
@@ -76,12 +82,17 @@
     CGFloat width = 0;
     UIColor *color = nil;
     if (drawInfo) {
-        if (drawInfo.count >= 2) {
+        if (drawInfo.count >= 1) {
             width = [drawInfo[0] floatValue];
+        }
+        
+        if (drawInfo.count >= 2) {
             NSString *hex = drawInfo[1];
             if ([drawType isEqualToString:kUkeDrawingAllTypes[2]] || // 圆
                 [drawType isEqualToString:kUkeDrawingAllTypes[3]]) { // 框
-                hex = drawInfo[2];
+                if (drawInfo.count >= 3) {
+                    hex = drawInfo[2];
+                }
             }
             hex = [hex substringFromIndex:1];
             NSInteger _hex = [self numberWithHexString:hex];

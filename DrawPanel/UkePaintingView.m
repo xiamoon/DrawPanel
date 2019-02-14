@@ -285,14 +285,16 @@
             }
         }
     }else if (_currentDrawingMode == UkeDrawingModeTriangle) { // 三角形
-        CGPoint point1 = [points[0] CGPointValue];
-        CGPoint point2 = [points[1] CGPointValue];
-
-        _currentPath = [UIBezierPath bezierPath];
-        [_currentPath moveToPoint:CGPointMake(_startPoint.x, _startPoint.y)];
-        [_currentPath addLineToPoint:CGPointMake(point1.x, point1.y)];
-        [_currentPath addLineToPoint:CGPointMake(point2.x, point2.y)];
-        [_currentPath closePath];
+        if (points.count == 2) {
+            CGPoint point1 = [points[0] CGPointValue];
+            CGPoint point2 = [points[1] CGPointValue];
+            
+            _currentPath = [UIBezierPath bezierPath];
+            [_currentPath moveToPoint:CGPointMake(_startPoint.x, _startPoint.y)];
+            [_currentPath addLineToPoint:CGPointMake(point1.x, point1.y)];
+            [_currentPath addLineToPoint:CGPointMake(point2.x, point2.y)];
+            [_currentPath closePath];
+        }
     }
     
     _currentLayer.path = _currentPath.CGPath;
