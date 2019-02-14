@@ -252,7 +252,7 @@
     }
     
     if (!_currentLayer && _currentDrawingMode != UkeDrawingModeEraser) {
-        [self createLayerWithWidth:width color:color startPoint:startPoint];
+        [self createLayerWithWidth:width color:color startPoint:startPoint isEraserRectangle:(_currentDrawingMode == UkeDrawingModeEraserRectangle)];
     }
     
     if (_currentDrawingMode == UkeDrawingModeBrush) { // 线
@@ -323,6 +323,31 @@
                 UIGraphicsEndImageContext();
             }
         }
+    }else if (_currentDrawingMode == UkeDrawingModeEraserRectangle) { // 框选删除
+        if (points.count) {
+            for (int i = 0; i < points.count; i ++) {
+                CGPoint currentPoint = [points[i] CGPointValue];
+                _currentPath = [UIBezierPath bezierPathWithRect:CGRectMake(_startPoint.x, _startPoint.y, currentPoint.x-_startPoint.x, currentPoint.y-_startPoint.y)];
+            }
+        }
+        
+        if (_drawingState == UkeDrawingStateEnd) {
+            UIGraphicsBeginImageContextWithOptions(self.frame.size, NO, [UIScreen mainScreen].scale);
+            CGContextRef context = UIGraphicsGetCurrentContext();
+            [self.layer renderInContext:context];
+            
+            while (self.layer.sublayers.count) {
+                [self.layer.sublayers.lastObject removeFromSuperlayer];
+            }
+            
+            CGContextSetLineWidth(context, 1.0);
+            CGContextSetBlendMode(context, kCGBlendModeClear);
+            CGContextAddPath(context, _currentPath.CGPath);
+            CGContextDrawPath(context, kCGPathFill);
+            UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+            self.layer.contents = (id)image.CGImage;
+            UIGraphicsEndImageContext();
+        }
     }
     
     if (_currentDrawingMode != UkeDrawingModeEraser) {
@@ -338,11 +363,17 @@
 
 - (void)createLayerWithWidth:(CGFloat)width
                                       color:(UIColor *)color
-                                 startPoint:(NSValue *)startPoint {
+                  startPoint:(NSValue *)startPoint
+           isEraserRectangle:(BOOL)isEraserRectangle {
     CAShapeLayer *layer = [[CAShapeLayer alloc] init];
     layer.backgroundColor = [UIColor clearColor].CGColor;
-    layer.fillColor = [UIColor clearColor].CGColor;
-    layer.strokeColor = color.CGColor;
+    if (isEraserRectangle) {
+        layer.fillColor = [[UIColor redColor] colorWithAlphaComponent:0.5].CGColor;
+        layer.strokeColor = [UIColor clearColor].CGColor;
+    }else {
+        layer.fillColor = [UIColor clearColor].CGColor;
+        layer.strokeColor = color.CGColor;
+    }
     layer.frame = self.frame;
     layer.lineWidth = width;
     [self.layer addSublayer:layer];

@@ -47,12 +47,20 @@
     return points.copy;
 }
 
-+ (NSArray<NSArray *> *)ellipsePoints1:(BOOL)eraser {
++ (NSArray<NSArray *> *)startPoints:(UkeDrawingMode)mode {
     NSMutableArray *points = [NSMutableArray array];
-    NSArray *start = @[@"252.5",@"130.83333333333334",@"14",@"brush",@[@"2",@"#EF4C4F"]];
-//    NSArray *start = @[@"252.5",@"130.83333333333334",@"14",@"ellipse",@[@"2",@"0",@"#EF4C4F",@"0"]];
-//    NSArray *start = @[@"252.5",@"130.83333333333334",@"14",@"rectangle",@[@"2",@"0",@"#EF4C4F",@"0"]];
-//    NSArray *start = @[@"252.5",@"130.83333333333334",@"14",@"line",@[@"2",@"#EF4C4F",@"0"]];
+    NSArray *start;
+    if (mode == UkeDrawingModeBrush) {
+        start = @[@"252.5",@"130.83333333333334",@"14",@"brush",@[@"2",@"#EF4C4F"]];
+    }else if (mode == UkeDrawingModeEllipse) {
+        start = @[@"252.5",@"130.83333333333334",@"14",@"ellipse",@[@"2",@"0",@"#EF4C4F",@"0"]];
+    }else if (mode == UkeDrawingModeRectangle) {
+        start = @[@"252.5",@"130.83333333333334",@"14",@"rectangle",@[@"2",@"0",@"#EF4C4F",@"0"]];
+    }else if (mode == UkeDrawingModeLine) {
+        start = @[@"252.5",@"130.83333333333334",@"14",@"line",@[@"2",@"#EF4C4F",@"0"]];
+    }else if (mode == UkeDrawingModeEraserRectangle) {
+        start = @[@"90.83333333333334",@"100.83333333333334",@"14",@"eraserrectangle",@[]];
+    }
     
     NSArray *point1 = @[@"254.16666666666669",@"133.33333333333334",@"14"];
     NSArray *point2 = @[@"255.83333333333334",@"138.33333333333334",@"14"];
@@ -68,11 +76,7 @@
     NSArray *point12 = @[@"285",@"168",@"14"];
     NSArray *point13 = @[@"293",@"180",@"14"];
 
-    if (eraser) {
-        [points addObject:@[@"252.5",@"130.83333333333334",@"14",@"eraser",@[@"40"]]];
-    }else {
-        [points addObject:start];
-    }
+    [points addObject:start];
     [points addObject:point1];
     [points addObject:point2];
     [points addObject:point3];
@@ -90,7 +94,7 @@
     return points.copy;
 }
 
-+ (NSArray<NSArray *> *)ellipsePoints2 {
++ (NSArray<NSArray *> *)points2 {
     NSMutableArray *points = [NSMutableArray array];
     
     NSArray *point1 = @[@"295",@"182",@"14"];
@@ -110,14 +114,14 @@
     return points.copy;
 }
 
-+ (NSArray<NSArray *> *)ellipsePoints3 {
++ (NSArray<NSArray *> *)points3 {
     NSMutableArray *points = [NSMutableArray array];
     NSArray *point1 = @[@"317",@"202",@"14"];
     [points addObject:point1];
     return points.copy;
 }
 
-+ (NSArray<NSArray *> *)ellipsePoints4 {
++ (NSArray<NSArray *> *)points4 {
     NSMutableArray *points = [NSMutableArray array];
     
     NSArray *point1 = @[@"317",@"202",@"14"];
@@ -137,14 +141,15 @@
     return points.copy;
 }
 
-+ (NSArray<NSArray *> *)ellipsePoints5 {
++ (NSArray<NSArray *> *)endPoints {
     NSMutableArray *points = [NSMutableArray array];
     NSArray *end = @[@"345",@"202",@"14",@"true"];
     [points addObject:end];
     return points.copy;
 }
 
-+ (NSArray<NSArray *> *)trianglePoint {
+
++ (NSArray<NSArray *> *)triangleWholePoints {
     NSMutableArray *points = [NSMutableArray array];
     NSArray *point = @[@"423.33333333333337",@"176.66666666666669",@"14",@"triangle",@[@"2",@"#ef4c4f",@"486.6666666666667", @"244.16666666666669", @"360",@"244.16666666666669",@"0",@"0"],@"true"];
     [points addObject:point];

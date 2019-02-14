@@ -67,6 +67,7 @@
                     }
                 }
             }else {
+                drawType = nil;
                 terminalFlag = singlePoint[3];
                 if ([terminalFlag isEqualToString:@"true"]) { // 终止点数据
                     NSValue *point = [NSValue valueWithCGPoint:CGPointMake([singlePoint[0] floatValue], [singlePoint[1] floatValue])];

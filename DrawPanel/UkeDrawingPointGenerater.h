@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "UkeDrawingConstants.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -16,14 +17,14 @@ NS_ASSUME_NONNULL_BEGIN
 + (NSArray<NSArray *> *)linePoints;
 
 // 画圆
-+ (NSArray<NSArray *> *)ellipsePoints1:(BOOL)eraser;
-+ (NSArray<NSArray *> *)ellipsePoints2;
-+ (NSArray<NSArray *> *)ellipsePoints3;
-+ (NSArray<NSArray *> *)ellipsePoints4;
-+ (NSArray<NSArray *> *)ellipsePoints5;
++ (NSArray<NSArray *> *)startPoints:(UkeDrawingMode)mode;
++ (NSArray<NSArray *> *)points2;
++ (NSArray<NSArray *> *)points3;
++ (NSArray<NSArray *> *)points4;
++ (NSArray<NSArray *> *)endPoints;
 
 // 画三角形
-+ (NSArray<NSArray *> *)trianglePoint;
++ (NSArray<NSArray *> *)triangleWholePoints;
 
 @end
 

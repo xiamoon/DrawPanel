@@ -39,39 +39,32 @@
 //        [self addGestureRecognizer:pan];
         
         // 真实数据测试画线
-        [self testDrawWithPoints:[UkeDrawingPointGenerater ellipsePoints1:NO]];
-        [self testDrawWithPoints:[UkeDrawingPointGenerater ellipsePoints2]];
-        [self testDrawWithPoints:[UkeDrawingPointGenerater ellipsePoints3]];
-        [self testDrawWithPoints:[UkeDrawingPointGenerater ellipsePoints4]];
-        [self testDrawWithPoints:[UkeDrawingPointGenerater ellipsePoints5]];
+        [self testDrawWithPoints:[UkeDrawingPointGenerater startPoints:UkeDrawingModeLine]];
+        [self testDrawWithPoints:[UkeDrawingPointGenerater points2]];
+        [self testDrawWithPoints:[UkeDrawingPointGenerater points3]];
+        [self testDrawWithPoints:[UkeDrawingPointGenerater points4]];
+        [self testDrawWithPoints:[UkeDrawingPointGenerater endPoints]];
 
-        
+        [self testDrawWithPoints:[UkeDrawingPointGenerater triangleWholePoints]];
+
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            // 测试画线
-//            [self drawLineWithPoints:[UkeDrawingPointGenerater linePoints]];
-            
-            // 测试画圆
-            [self testDrawWithPoints:[UkeDrawingPointGenerater ellipsePoints1:YES]];
-            
-            // 画三角形
-//            [self testDrawWithPoints:[UkeDrawingPointGenerater trianglePoint]];
+            [self testDrawWithPoints:[UkeDrawingPointGenerater startPoints:UkeDrawingModeEraserRectangle]];
         });
         
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [self testDrawWithPoints:[UkeDrawingPointGenerater ellipsePoints2]];
+            [self testDrawWithPoints:[UkeDrawingPointGenerater points2]];
         });
 
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [self testDrawWithPoints:[UkeDrawingPointGenerater ellipsePoints3]];
+            NSMutableArray *points = [NSMutableArray array];
+            NSArray *end = @[@"302",@"190",@"14",@"true"];
+            [points addObject:end];
+            [self testDrawWithPoints:points];
         });
 
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(4.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [self testDrawWithPoints:[UkeDrawingPointGenerater ellipsePoints4]];
-        });
-
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(4.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [self testDrawWithPoints:[UkeDrawingPointGenerater ellipsePoints5]];
-        });
+//        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(4.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+//            [self testDrawWithPoints:[UkeDrawingPointGenerater endPoints]];
+//        });
     }
     return self;
 }
@@ -96,7 +89,7 @@
 - (void)testDrawWithPoints:(NSArray<NSArray *> *)points {
     __weak typeof(self)weakSelf = self;
     [_pointParser parseWithPoints:points completion:^(UkeDrawingPointParser * _Nonnull parser) {
-        [weakSelf.paintingView drawWithMode:weakSelf.pointParser.drawingMode startPoint:weakSelf.pointParser.startPoint otherPoints:weakSelf.pointParser.drawingPoints width:weakSelf.pointParser.lineWidth color:weakSelf.pointParser.color drawingState:weakSelf.pointParser.drawingState];
+        [weakSelf.paintingView drawWithMode:parser.drawingMode startPoint:parser.startPoint otherPoints:parser.drawingPoints width:parser.lineWidth color:parser.color drawingState:parser.drawingState];
     }];
 }
 
