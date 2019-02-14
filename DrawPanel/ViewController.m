@@ -21,13 +21,13 @@
     UISegmentedControl *seg = [[UISegmentedControl alloc] initWithItems:@[@"线", @"线段", @"圆", @"框", @"文字", @"橡皮", @"框选删除", @"箭头", @"三角"]];
     seg.frame = CGRectMake(0, 20, CGRectGetWidth(self.view.bounds), 44.0);
     [seg addTarget:self action:@selector(handleSegAction:) forControlEvents:UIControlEventValueChanged];
-    [self.view addSubview:seg];
+//    [self.view addSubview:seg];
     
     UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
     button.tag = 1000;
     [button setTitle:@"上一页" forState:UIControlStateNormal];
     [button setTitleColor:[UIColor blueColor] forState:UIControlStateNormal];
-    button.frame = CGRectMake(0, CGRectGetMaxY(seg.frame), 100, 44.0);
+    button.frame = CGRectMake(0, 64, 100, 44.0);
     button.layer.cornerRadius = 4;
     button.layer.borderColor = [UIColor blueColor].CGColor;
     button.layer.borderWidth = 1.0;
@@ -38,7 +38,7 @@
     button2.tag = 1001;
     [button2 setTitle:@"下一页" forState:UIControlStateNormal];
     [button2 setTitleColor:[UIColor blueColor] forState:UIControlStateNormal];
-    button2.frame = CGRectMake(375-100, CGRectGetMaxY(seg.frame), 100, 44.0);
+    button2.frame = CGRectMake(375-100, 64, 100, 44.0);
     button2.layer.cornerRadius = 4;
     button2.layer.borderColor = [UIColor blueColor].CGColor;
     button2.layer.borderWidth = 1.0;

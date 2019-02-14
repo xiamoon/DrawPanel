@@ -11,7 +11,9 @@
 
 @implementation UkeDrawingPointParser
 
-- (void)parseWithPoints:(NSArray<NSArray *> *)points {
+- (void)parseWithPoints:(NSArray<NSArray *> *)points
+             completion:(void(^)(UkeDrawingPointParser *parser))completionHandler {
+    [self clearUpInfo];
     NSMutableArray<NSValue *> *drawingPoints = [NSMutableArray array];
     
     __block NSString *action = nil;
@@ -21,7 +23,6 @@
     __block NSString *terminalFlag = nil;
     
     [points enumerateObjectsUsingBlock:^(NSArray *singlePoint, NSUInteger index, BOOL * _Nonnull stop) {
-        
         if (singlePoint.count >= 3) {
             action = singlePoint[2];
         }
@@ -83,13 +84,28 @@
         drawingMode = (UkeDrawingMode)[[UkeDrawingPointGenerater allDrawTypes] indexOfObject:drawType];
     }
     
-    
+    self.action = action;
     self.drawingMode = drawingMode;
     self.startPoint = startPoint;
     self.drawingPoints = drawingPoints;
     self.lineWidth = width;
     self.color = color;
     self.drawingState = terminalFlag?UkeDrawingStateEnd:UkeDrawingStateDrawing;
+    
+    __weak typeof(self)weakSelf = self;
+    if (completionHandler) {
+        completionHandler(weakSelf);
+    }
+}
+
+- (void)clearUpInfo {
+    self.action = nil;
+    self.drawingMode = UkeDrawingModeUnKnown;
+    self.startPoint = nil;
+    self.drawingPoints = nil;
+    self.lineWidth = 0;
+    self.color = nil;
+    self.drawingState = UkeDrawingStateUnknown;
 }
 
 - (NSInteger)numberWithHexString:(NSString *)hexString{

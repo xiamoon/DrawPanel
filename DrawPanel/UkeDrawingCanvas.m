@@ -17,6 +17,10 @@
 @property (nonatomic, strong) UkePaintingView *paintingView;
 //! 绘画起始点
 @property (nonatomic, assign) CGPoint startPoint;
+
+//! 当前actionId
+@property (nonatomic, copy) NSString *currentAction;
+
 @end
 
 @implementation UkeDrawingCanvas
@@ -31,8 +35,8 @@
         _paintingView = [[UkePaintingView alloc] init];
         [self addSubview:_paintingView];
         
-        UIPanGestureRecognizer *pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePanGesture:)];
-        [self addGestureRecognizer:pan];
+//        UIPanGestureRecognizer *pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePanGesture:)];
+//        [self addGestureRecognizer:pan];
         
         // 真实数据测试画线
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
@@ -70,16 +74,26 @@
     }
 }
 
+- (UIImage *)currentContents {
+    return _paintingView.currentContents;
+}
+
+- (void)setCurrentContents:(UIImage *)currentContents {
+    [_paintingView setCurrentContents:currentContents];
+}
 
 
 #pragma mark - 数据点驱动绘画
 - (void)testDrawWithPoints:(NSArray<NSArray *> *)points {
-    [_pointParser parseWithPoints:points];
-    [_paintingView drawWithMode:_pointParser.drawingMode startPoint:_pointParser.startPoint otherPoints:_pointParser.drawingPoints width:_pointParser.lineWidth color:_pointParser.color drawingState:_pointParser.drawingState];
+    __weak typeof(self)weakSelf = self;
+    [_pointParser parseWithPoints:points completion:^(UkeDrawingPointParser * _Nonnull parser) {
+        [weakSelf.paintingView drawWithMode:weakSelf.pointParser.drawingMode startPoint:weakSelf.pointParser.startPoint otherPoints:weakSelf.pointParser.drawingPoints width:weakSelf.pointParser.lineWidth color:weakSelf.pointParser.color drawingState:weakSelf.pointParser.drawingState];
+    }];
 }
 
 
 #pragma mark - 手势驱动绘画
+/*
 - (void)handlePanGesture:(UIGestureRecognizer *)pan {
     CGPoint point = [pan locationInView:self];
     
@@ -106,14 +120,6 @@
     _paintingView.currentDrawingMode = currentDrawingMode;
 }
 
-- (UIImage *)currentContents {
-    return _paintingView.currentContents;
-}
-
-- (void)setCurrentContents:(UIImage *)currentContents {
-    [_paintingView setCurrentContents:currentContents];
-}
-
 - (UkeDrawingState)drawingStateFromGestureState:(UIGestureRecognizerState)state {
     UkeDrawingState drawingState = UkeDrawingStateUnknown;
     if (state == UIGestureRecognizerStateBegan) {
@@ -127,7 +133,9 @@
     }
     return drawingState;
 }
+*/
 
+ 
 - (void)dealloc {
     NSLog(@"手绘板canvas销毁");
 }
