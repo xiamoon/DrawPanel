@@ -27,7 +27,7 @@
     button.tag = 1000;
     [button setTitle:@"上一页" forState:UIControlStateNormal];
     [button setTitleColor:[UIColor blueColor] forState:UIControlStateNormal];
-    button.frame = CGRectMake(0, 64, 100, 44.0);
+    button.frame = CGRectMake(40, 0, 100, 44.0);
     button.layer.cornerRadius = 4;
     button.layer.borderColor = [UIColor blueColor].CGColor;
     button.layer.borderWidth = 1.0;
@@ -38,7 +38,7 @@
     button2.tag = 1001;
     [button2 setTitle:@"下一页" forState:UIControlStateNormal];
     [button2 setTitleColor:[UIColor blueColor] forState:UIControlStateNormal];
-    button2.frame = CGRectMake(375-100, 64, 100, 44.0);
+    button2.frame = CGRectMake(CGRectGetWidth(self.view.frame)-100-40, 0, 100, 44.0);
     button2.layer.cornerRadius = 4;
     button2.layer.borderColor = [UIColor blueColor].CGColor;
     button2.layer.borderWidth = 1.0;
@@ -48,12 +48,12 @@
     UIImageView *bgView = [[UIImageView alloc] init];
     bgView.contentMode = UIViewContentModeScaleAspectFill;
     bgView.layer.masksToBounds = YES;
-    bgView.frame = CGRectMake(0, CGRectGetMaxY(button.frame), CGRectGetWidth(self.view.bounds), CGRectGetHeight(self.view.bounds)-44.0*2);
+    bgView.frame = CGRectMake(40, CGRectGetMaxY(button.frame), CGRectGetWidth(self.view.bounds)-80, CGRectGetHeight(self.view.bounds)-CGRectGetMaxY(button.frame));
     bgView.image = [UIImage imageNamed:@"test.jpeg"];
     [self.view addSubview:bgView];
     
     UkeDrawingDisplayPanel *panel = [[UkeDrawingDisplayPanel alloc] init];
-    panel.frame = CGRectMake(0, CGRectGetMaxY(button.frame), CGRectGetWidth(self.view.bounds), CGRectGetHeight(self.view.bounds)-44.0*2);
+    panel.frame = bgView.frame;
     [self.view addSubview:panel];
     _panel = panel;
     

@@ -22,6 +22,9 @@ NS_ASSUME_NONNULL_BEGIN
 + (NSArray<NSArray *> *)ellipsePoints4;
 + (NSArray<NSArray *> *)ellipsePoints5;
 
+// 画三角形
++ (NSArray<NSArray *> *)trianglePoint;
+
 @end
 
 NS_ASSUME_NONNULL_END

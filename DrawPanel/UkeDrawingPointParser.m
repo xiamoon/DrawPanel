@@ -45,8 +45,17 @@
                 if (singlePoint.count >= 6) {
                     terminalFlag = singlePoint[5];
                     if ([terminalFlag isEqualToString:@"true"]) { // 终止点数据
-                        NSValue *point = [NSValue valueWithCGPoint:CGPointMake([singlePoint[0] floatValue], [singlePoint[1] floatValue])];
-                        [drawingPoints addObject:point];
+                        if ([drawType isEqualToString:kUkeDrawingAllTypes[8]]) { // 三角形
+                            // 三角形的剩下两个点在drawInfo里面
+                            NSValue *point1 = [NSValue valueWithCGPoint:CGPointMake([drawInfo[2] floatValue], [drawInfo[3] floatValue])];
+                            NSValue *point2 = [NSValue valueWithCGPoint:CGPointMake([drawInfo[4] floatValue], [drawInfo[5] floatValue])];
+                            
+                            [drawingPoints addObject:point1];
+                            [drawingPoints addObject:point2];
+                        }else {
+                            NSValue *point = [NSValue valueWithCGPoint:CGPointMake([singlePoint[0] floatValue], [singlePoint[1] floatValue])];
+                            [drawingPoints addObject:point];
+                        }
                     }else {
                         terminalFlag = nil;
                     }

@@ -247,12 +247,18 @@
         _drawingState = UkeDrawingStateStart;
     }
     
+    if (startPoint) {
+        _startPoint = startPoint.CGPointValue;
+    }
+    
+    if (!_currentLayer) {
+        [self createLayerWithWidth:width color:color startPoint:startPoint];
+    }
+    
     if (_currentDrawingMode == UkeDrawingModeBrush) { // 线
-        if (!_currentLayer || !_currentPath) {
-            [self createLayerWithWidth:width color:color startPoint:startPoint];
-            UIBezierPath *path = [UIBezierPath bezierPath];
-            [path moveToPoint:startPoint.CGPointValue];
-            _currentPath = path;
+        if (!_currentPath) {
+            _currentPath = [UIBezierPath bezierPath];
+            [_currentPath moveToPoint:startPoint.CGPointValue];
         }
         
         if (points.count) {
@@ -264,14 +270,6 @@
     }else if (_currentDrawingMode == UkeDrawingModeEllipse || // 椭圆
               _currentDrawingMode == UkeDrawingModeRectangle || // 矩形框
               _currentDrawingMode == UkeDrawingModeLine) { // 线段
-        if (startPoint) {
-            _startPoint = startPoint.CGPointValue;
-        }
-        
-        if (!_currentLayer) {
-            [self createLayerWithWidth:width color:color startPoint:startPoint];
-        }
-        
         if (points.count) {
             for (int i = 0; i < points.count; i ++) {
                 CGPoint currentPoint = [points[i] CGPointValue];
@@ -286,6 +284,15 @@
                 }
             }
         }
+    }else if (_currentDrawingMode == UkeDrawingModeTriangle) { // 三角形
+        CGPoint point1 = [points[0] CGPointValue];
+        CGPoint point2 = [points[1] CGPointValue];
+
+        _currentPath = [UIBezierPath bezierPath];
+        [_currentPath moveToPoint:CGPointMake(_startPoint.x, _startPoint.y)];
+        [_currentPath addLineToPoint:CGPointMake(point1.x, point1.y)];
+        [_currentPath addLineToPoint:CGPointMake(point2.x, point2.y)];
+        [_currentPath closePath];
     }
     
     _currentLayer.path = _currentPath.CGPath;

@@ -140,4 +140,11 @@
     return points.copy;
 }
 
++ (NSArray<NSArray *> *)trianglePoint {
+    NSMutableArray *points = [NSMutableArray array];
+    NSArray *point = @[@"423.33333333333337",@"176.66666666666669",@"14",@"triangle",@[@"2",@"#ef4c4f",@"486.6666666666667", @"244.16666666666669", @"360",@"244.16666666666669",@"0",@"0"],@"true"];
+    [points addObject:point];
+    return points.copy;
+}
+
 @end
