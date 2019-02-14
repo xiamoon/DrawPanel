@@ -39,32 +39,39 @@
 //        [self addGestureRecognizer:pan];
         
         // 真实数据测试画线
+        [self testDrawWithPoints:[UkeDrawingPointGenerater ellipsePoints1:NO]];
+        [self testDrawWithPoints:[UkeDrawingPointGenerater ellipsePoints2]];
+        [self testDrawWithPoints:[UkeDrawingPointGenerater ellipsePoints3]];
+        [self testDrawWithPoints:[UkeDrawingPointGenerater ellipsePoints4]];
+        [self testDrawWithPoints:[UkeDrawingPointGenerater ellipsePoints5]];
+
+        
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             // 测试画线
 //            [self drawLineWithPoints:[UkeDrawingPointGenerater linePoints]];
             
             // 测试画圆
-//            [self testDrawWithPoints:[UkeDrawingPointGenerater ellipsePoints1]];
+            [self testDrawWithPoints:[UkeDrawingPointGenerater ellipsePoints1:YES]];
             
             // 画三角形
-            [self testDrawWithPoints:[UkeDrawingPointGenerater trianglePoint]];
+//            [self testDrawWithPoints:[UkeDrawingPointGenerater trianglePoint]];
         });
         
-//        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-//            [self testDrawWithPoints:[UkeDrawingPointGenerater ellipsePoints2]];
-//        });
-//
-//        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-//            [self testDrawWithPoints:[UkeDrawingPointGenerater ellipsePoints3]];
-//        });
-//
-//        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(4.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-//            [self testDrawWithPoints:[UkeDrawingPointGenerater ellipsePoints4]];
-//        });
-//
-//        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(4.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-//            [self testDrawWithPoints:[UkeDrawingPointGenerater ellipsePoints5]];
-//        });
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [self testDrawWithPoints:[UkeDrawingPointGenerater ellipsePoints2]];
+        });
+
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [self testDrawWithPoints:[UkeDrawingPointGenerater ellipsePoints3]];
+        });
+
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(4.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [self testDrawWithPoints:[UkeDrawingPointGenerater ellipsePoints4]];
+        });
+
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(4.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [self testDrawWithPoints:[UkeDrawingPointGenerater ellipsePoints5]];
+        });
     }
     return self;
 }

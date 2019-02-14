@@ -16,7 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (NSArray<NSArray *> *)linePoints;
 
 // 画圆
-+ (NSArray<NSArray *> *)ellipsePoints1;
++ (NSArray<NSArray *> *)ellipsePoints1:(BOOL)eraser;
 + (NSArray<NSArray *> *)ellipsePoints2;
 + (NSArray<NSArray *> *)ellipsePoints3;
 + (NSArray<NSArray *> *)ellipsePoints4;

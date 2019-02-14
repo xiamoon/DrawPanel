@@ -251,7 +251,7 @@
         _startPoint = startPoint.CGPointValue;
     }
     
-    if (!_currentLayer) {
+    if (!_currentLayer && _currentDrawingMode != UkeDrawingModeEraser) {
         [self createLayerWithWidth:width color:color startPoint:startPoint];
     }
     
@@ -295,9 +295,39 @@
             [_currentPath addLineToPoint:CGPointMake(point2.x, point2.y)];
             [_currentPath closePath];
         }
+    }else if (_currentDrawingMode == UkeDrawingModeEraser) { // 橡皮擦
+        if (!_currentPath) {
+            _currentPath = [UIBezierPath bezierPath];
+            [_currentPath moveToPoint:_startPoint];
+        }
+        
+        if (points.count) {
+            for (int i = 0; i < points.count; i ++) {
+                CGPoint currentPoint = [points[i] CGPointValue];
+                [_currentPath addLineToPoint:currentPoint];
+                
+                UIGraphicsBeginImageContextWithOptions(self.frame.size, NO, [UIScreen mainScreen].scale);
+                CGContextRef context = UIGraphicsGetCurrentContext();
+                [self.layer renderInContext:context];
+                
+                while (self.layer.sublayers.count) {
+                    [self.layer.sublayers.lastObject removeFromSuperlayer];
+                }
+                
+                CGContextSetLineWidth(context, 10);
+                CGContextSetBlendMode(context, kCGBlendModeClear);
+                CGContextAddPath(context, _currentPath.CGPath);
+                CGContextDrawPath(context, kCGPathStroke);
+                UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+                self.layer.contents = (id)image.CGImage;
+                UIGraphicsEndImageContext();
+            }
+        }
     }
     
-    _currentLayer.path = _currentPath.CGPath;
+    if (_currentDrawingMode != UkeDrawingModeEraser) {
+        _currentLayer.path = _currentPath.CGPath;
+    }
     
     if (_drawingState == UkeDrawingStateEnd) {
         _currentLayer = nil;
