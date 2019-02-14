@@ -20,6 +20,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) CGFloat lineWidth;
 @property (nonatomic, strong, nullable) UIColor *color;
 
+@property (nonatomic, copy, nullable) NSString *text;
+
 @property (nonatomic, strong, nullable) NSValue *startPoint;
 @property (nonatomic, strong, nullable) NSArray<NSValue *> *drawingPoints; // 不包含起始点
 

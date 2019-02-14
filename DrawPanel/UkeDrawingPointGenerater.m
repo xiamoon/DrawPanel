@@ -156,4 +156,11 @@
     return points.copy;
 }
 
++ (NSArray<NSArray *> *)textWholePoints {
+    NSMutableArray *points = [NSMutableArray array];
+    NSArray *point = @[@"260",@"185",@"14",@"texttool",@[@"14",@"#ef4c4f"],@"true",@"看空间"];
+    [points addObject:point];
+    return points.copy;
+}
+
 @end

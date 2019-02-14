@@ -38,14 +38,16 @@
 //        UIPanGestureRecognizer *pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePanGesture:)];
 //        [self addGestureRecognizer:pan];
         
-        // 真实数据测试画线
+        // 画笔
         [self testDrawWithPoints:[UkeDrawingPointGenerater startPoints:UkeDrawingModeLine]];
         [self testDrawWithPoints:[UkeDrawingPointGenerater points2]];
         [self testDrawWithPoints:[UkeDrawingPointGenerater points3]];
         [self testDrawWithPoints:[UkeDrawingPointGenerater points4]];
         [self testDrawWithPoints:[UkeDrawingPointGenerater endPoints]];
-
+        // 三角形
         [self testDrawWithPoints:[UkeDrawingPointGenerater triangleWholePoints]];
+        // 文字
+        [self testDrawWithPoints:[UkeDrawingPointGenerater textWholePoints]];
 
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             [self testDrawWithPoints:[UkeDrawingPointGenerater startPoints:UkeDrawingModeEraserRectangle]];
@@ -89,7 +91,11 @@
 - (void)testDrawWithPoints:(NSArray<NSArray *> *)points {
     __weak typeof(self)weakSelf = self;
     [_pointParser parseWithPoints:points completion:^(UkeDrawingPointParser * _Nonnull parser) {
-        [weakSelf.paintingView drawWithMode:parser.drawingMode startPoint:parser.startPoint otherPoints:parser.drawingPoints width:parser.lineWidth color:parser.color drawingState:parser.drawingState];
+        if (parser.drawingMode == UkeDrawingModeText) {
+            [weakSelf.paintingView drawTextWithText:parser.text startPoint:parser.startPoint fontSize:parser.lineWidth color:parser.color drawingState:parser.drawingState];
+        }else {
+            [weakSelf.paintingView drawWithMode:parser.drawingMode startPoint:parser.startPoint otherPoints:parser.drawingPoints width:parser.lineWidth color:parser.color drawingState:parser.drawingState];
+        }
     }];
 }
 

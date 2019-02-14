@@ -21,6 +21,7 @@
     __block NSArray *drawInfo = nil; // 画笔信息，如粗细，颜色等
     __block NSValue *startPoint = nil;
     __block NSString *terminalFlag = nil;
+    __block NSString *text = nil;
     
     [points enumerateObjectsUsingBlock:^(NSArray *singlePoint, NSUInteger index, BOOL * _Nonnull stop) {
         if (singlePoint.count < 2) {
@@ -58,7 +59,11 @@
                                 [drawingPoints addObject:point1];
                                 [drawingPoints addObject:point2];
                             }
-                        }else {
+                        } else if ([drawType isEqualToString:kUkeDrawingAllTypes[4]]) { // 文字
+                            if (singlePoint.count >= 7) {
+                                text = singlePoint[6];
+                            }
+                        } else {
                             NSValue *point = [NSValue valueWithCGPoint:CGPointMake([singlePoint[0] floatValue], [singlePoint[1] floatValue])];
                             [drawingPoints addObject:point];
                         }
@@ -112,6 +117,7 @@
     self.drawingPoints = drawingPoints;
     self.lineWidth = width;
     self.color = color;
+    self.text = text;
     self.drawingState = terminalFlag?UkeDrawingStateEnd:UkeDrawingStateDrawing;
     
     __weak typeof(self)weakSelf = self;

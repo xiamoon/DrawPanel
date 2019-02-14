@@ -32,6 +32,13 @@ NS_ASSUME_NONNULL_BEGIN
                      color:(UIColor *)color
               drawingState:(UkeDrawingState)state;
 
+// 画文字
+- (void)drawTextWithText:(NSString *)text
+              startPoint:(NSValue *)startPoint
+                         fontSize:(CGFloat)fontSize
+                         color:(UIColor *)color
+                  drawingState:(UkeDrawingState)state;
+
 @end
 
 NS_ASSUME_NONNULL_END

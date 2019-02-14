@@ -26,6 +26,9 @@ NS_ASSUME_NONNULL_BEGIN
 // 画三角形
 + (NSArray<NSArray *> *)triangleWholePoints;
 
+// 文字
++ (NSArray<NSArray *> *)textWholePoints;
+
 @end
 
 NS_ASSUME_NONNULL_END

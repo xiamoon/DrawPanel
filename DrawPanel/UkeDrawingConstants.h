@@ -36,10 +36,10 @@ typedef NS_ENUM(NSInteger, UkeDrawingMode) {
     UkeDrawingModeLine, //! 线段
     UkeDrawingModeEllipse, //! 椭圆
     UkeDrawingModeRectangle, //! 矩形框
-    UkeDrawingModeWords, //! 文字
+    UkeDrawingModeText, //! 文字
     UkeDrawingModeEraser, //! 橡皮擦
     UkeDrawingModeEraserRectangle, //! 框选删除
-    UkeDrawingModeEraserArrow, //! 箭头
+    UkeDrawingModeLineArrow, //! 箭头
     UkeDrawingModeTriangle, //! 三角形
     UkeDrawingModeStar, //! 五角星
 };

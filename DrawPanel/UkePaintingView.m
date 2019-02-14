@@ -200,7 +200,7 @@
             [_paths addObject:pathInfo];
         }
         _currentLayer.path = _currentPath.CGPath;
-    }else if (_currentDrawingMode == UkeDrawingModeEraserArrow) {
+    }else if (_currentDrawingMode == UkeDrawingModeLineArrow) {
         
     }else if (_currentDrawingMode == UkeDrawingModeTriangle) {
         UIBezierPath *path = [UIBezierPath bezierPath];
@@ -230,6 +230,7 @@
         _currentLayer.path = _currentPath.CGPath;
     }
 }
+
 
 
 - (void)drawWithMode:(UkeDrawingMode)drawingMode
@@ -360,6 +361,27 @@
     }
 }
 
+- (void)drawTextWithText:(NSString *)text
+              startPoint:(NSValue *)startPoint
+                   fontSize:(CGFloat)fontSize
+                   color:(UIColor *)color
+            drawingState:(UkeDrawingState)state {
+    if (![text isKindOfClass:[NSString class]] || !text.length) {
+        return;
+    }
+    
+    CGPoint point = startPoint.CGPointValue;
+    
+    CATextLayer *textLayer = [[CATextLayer alloc] init];
+    textLayer.backgroundColor = [UIColor clearColor].CGColor;
+    NSMutableAttributedString *attri = [[NSMutableAttributedString alloc] initWithString:text];
+    [attri addAttribute:NSForegroundColorAttributeName value:color range:NSMakeRange(0, text.length)];
+    [attri addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:fontSize] range:NSMakeRange(0, text.length)];
+    CGSize textSize = [attri boundingRectWithSize:self.bounds.size options:0 context:NULL].size;
+    textLayer.frame = CGRectMake(point.x, point.y, textSize.width, textSize.height);
+    textLayer.string = attri;
+    [self.layer addSublayer:textLayer];
+}
 
 - (void)createLayerWithWidth:(CGFloat)width
                                       color:(UIColor *)color
