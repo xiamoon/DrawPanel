@@ -59,13 +59,17 @@ static CGFloat degreeForAtan(double a) {
     return (radian*180.0/M_PI);
 }
 
+//! 角度转弧度
+static double radianFromDegree(double degree) {
+    return (degree/180.0*M_PI);
+}
+
+// 弧度转角度
+static double degreeFromRadian(double radian) {
+    return (radian*180.0/M_PI);
+}
 
 - (void)drawWithStartPoint:(CGPoint)startPoint currentPoint:(CGPoint)currentPoint {
-    UIBezierPath *path = [UIBezierPath bezierPath];
-    [path moveToPoint:startPoint];
-    [path addLineToPoint:currentPoint];
-    _currentPath = path;
-    
     if (_drawingState == UkeDrawingStateStart) {
         CAShapeLayer *layer = [[CAShapeLayer alloc] init];
         layer.backgroundColor = [UIColor clearColor].CGColor;
@@ -73,51 +77,92 @@ static CGFloat degreeForAtan(double a) {
         layer.strokeColor = [UIColor redColor].CGColor;
         layer.frame = self.frame;
         [self.layer addSublayer:layer];
-        
         _currentLayer = layer;
     }
     
-    UIBezierPath *arrowPath = [UIBezierPath bezierPath];
-    [arrowPath moveToPoint:CGPointMake(0, 0)];
-    [arrowPath addLineToPoint:CGPointMake(20, 0)];
-    [arrowPath addLineToPoint:CGPointMake(20, 20)];
-    CAShapeLayer *arrowLayer = _currentLayer.sublayers.firstObject;
-    if (!arrowLayer) {
-        arrowLayer = [[CAShapeLayer alloc] init];
-        arrowLayer.anchorPoint = CGPointMake(1.0, 0);
-        arrowLayer.bounds = CGRectMake(0, 0, 20, 20);
-        arrowLayer.backgroundColor = [UIColor orangeColor].CGColor;
-        arrowLayer.fillColor = [UIColor clearColor].CGColor;
-        arrowLayer.strokeColor = [UIColor redColor].CGColor;
-        [_currentLayer addSublayer:arrowLayer];
+    while (_currentLayer.sublayers.count) {
+        [_currentLayer.sublayers.lastObject removeFromSuperlayer];
     }
+    
+    CGFloat a = currentPoint.x-startPoint.x;
+    CGFloat b = startPoint.y-currentPoint.y;
+    CGFloat c = sqrt(a*a+b*b);
+    CGFloat degreeB = degreeForASin(fabs(b)/c);
+    CGFloat degreeRotate = 0;
+    if (a>0 && b>=0) { // 第一象限
+        degreeRotate = 360.0-degreeB;
+    }else if (a<=0 && b>=0) { // 第二象限
+        degreeRotate = 180.0+degreeB;
+    }else if (a<=0 && b<0) { // 第三象限
+        degreeRotate = 180.0-degreeB;
+    }else if (a>0 && b<=0) {// 第四象限
+        degreeRotate = degreeB;
+    }
+    
+    // 箭头夹角（小于90度）
+    CGFloat arrowDegree = 60.0;
+    // 一半箭头的夹角
+    CGFloat singleArrowDegree = arrowDegree*0.5;
+    // 线宽
+    CGFloat lineWidth = 2.0;
+    // n决定箭头两边的长短。n越大，箭头两边越长，反之，越短
+    CGFloat n = lineWidth;
+    // 线加上箭头总体宽度，即下面lineLayer的宽度
+    CGFloat lineLayerWidth = 2*n+2*lineWidth*cos(radianFromDegree(singleArrowDegree)) +lineWidth;
+    
+    // 线段
+    CAShapeLayer *lineLayer = [[CAShapeLayer alloc] init];
+    lineLayer.anchorPoint = CGPointMake(0, 0.5);
+    lineLayer.position = startPoint;
+    lineLayer.backgroundColor = [UIColor clearColor].CGColor;
+    lineLayer.lineWidth = lineWidth;
+    lineLayer.fillColor = [UIColor clearColor].CGColor;
+    lineLayer.strokeColor = [UIColor redColor].CGColor;
+    [_currentLayer addSublayer:lineLayer];
+    
+    UIBezierPath *linePath = [UIBezierPath bezierPath];
+    [linePath moveToPoint:CGPointMake(0, lineLayerWidth*0.5)];
+    [linePath addLineToPoint:CGPointMake(c-0.5*lineWidth/sin(radianFromDegree(singleArrowDegree)), lineLayerWidth*0.5)];
+    lineLayer.path = linePath.CGPath;
+    
+    // 箭头
+    CAShapeLayer *arrowLayer = [[CAShapeLayer alloc] init];
+    arrowLayer.bounds = CGRectMake(0, 0, lineLayerWidth, lineLayerWidth);
+    arrowLayer.position = CGPointMake(c-lineLayerWidth*0.5, lineLayerWidth*0.5);
+    arrowLayer.backgroundColor = [UIColor clearColor].CGColor;
+    arrowLayer.lineWidth = lineWidth;
+    arrowLayer.fillColor = [UIColor clearColor].CGColor;
+    arrowLayer.strokeColor = [UIColor redColor].CGColor;
+    [lineLayer addSublayer:arrowLayer];
+    
+    UIBezierPath *arrowPath = [UIBezierPath bezierPath];
+    [arrowPath moveToPoint:CGPointMake(0.5*lineWidth*sin(radianFromDegree(singleArrowDegree)), 0.5*lineWidth*cos(radianFromDegree(singleArrowDegree)))];
+    [arrowPath addLineToPoint:CGPointMake(lineLayerWidth-0.5*lineWidth/sin(radianFromDegree(singleArrowDegree)), lineLayerWidth*0.5)];
+    [arrowPath addLineToPoint:CGPointMake(0.5*lineWidth*sin(radianFromDegree(singleArrowDegree)), lineLayerWidth-0.5*lineWidth*cos(radianFromDegree(singleArrowDegree)))];
     arrowLayer.path = arrowPath.CGPath;
 
+    // 整体拉长和旋转
     [CATransaction begin];
     [CATransaction setDisableActions:YES];
-    arrowLayer.position = CGPointMake(currentPoint.x, currentPoint.y);
+    lineLayer.bounds = CGRectMake(0, 0, c, lineLayerWidth);
+    [lineLayer setAffineTransform:CGAffineTransformMakeRotation(degreeRotate/180.0*M_PI)];
     [CATransaction commit];
     
-    if (!CGPointEqualToPoint(startPoint, currentPoint)) {
-        CGFloat a = currentPoint.x-startPoint.x;
-        CGFloat b = startPoint.y-currentPoint.y;
-        CGFloat degreeA = degreeForASin(a/sqrt(a*a+b*b));
-        CGFloat degreeDelta = degreeA>0 ? (45-degreeA) : -(45-degreeA+90);
-        
-        [CATransaction begin];
-        [CATransaction setDisableActions:YES];
-        [arrowLayer setAffineTransform:CGAffineTransformMakeRotation((360-degreeDelta)/180.0*M_PI)];
-        [CATransaction commit];
-    }
-    
-    _currentLayer.path = _currentPath.CGPath;
-    
-    if (_drawingState == UkeDrawingStateEnd) {
-        CGFloat degreeA = degreeForAtan(-sqrt(3));
-        NSLog(@"---> degreee:%.2f", degreeA);
-    }
-    
     return;
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     if (_currentDrawingMode == UkeDrawingModeBrush) { //! 画曲线
         if (_drawingState == UkeDrawingStateStart) {
             CAShapeLayer *layer = [[CAShapeLayer alloc] init];
