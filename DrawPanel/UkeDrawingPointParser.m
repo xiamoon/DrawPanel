@@ -34,7 +34,7 @@
             }
         }else {
             drawType = singlePoint[3];
-            if ([[UkeDrawingPointGenerater allDrawTypes] containsObject:drawType]) { // 起始点数据
+            if ([kUkeDrawingAllTypes containsObject:drawType]) { // 起始点数据
                 NSValue *point = [NSValue valueWithCGPoint:CGPointMake([singlePoint[0] floatValue], [singlePoint[1] floatValue])];
                 startPoint = point;
                 
@@ -70,7 +70,8 @@
         if (drawInfo.count >= 2) {
             width = [drawInfo[0] floatValue];
             NSString *hex = drawInfo[1];
-            if ([drawType isEqualToString:[UkeDrawingPointGenerater allDrawTypes][2]]) { // 圆
+            if ([drawType isEqualToString:kUkeDrawingAllTypes[2]] || // 圆
+                [drawType isEqualToString:kUkeDrawingAllTypes[3]]) { // 框
                 hex = drawInfo[2];
             }
             hex = [hex substringFromIndex:1];
@@ -81,7 +82,7 @@
     
     UkeDrawingMode drawingMode = UkeDrawingModeUnKnown;
     if (drawType) {
-        drawingMode = (UkeDrawingMode)[[UkeDrawingPointGenerater allDrawTypes] indexOfObject:drawType];
+        drawingMode = (UkeDrawingMode)[kUkeDrawingAllTypes indexOfObject:drawType];
     }
     
     self.action = action;

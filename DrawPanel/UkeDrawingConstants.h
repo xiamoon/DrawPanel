@@ -27,6 +27,9 @@
     #define UIColorHex(_hex_)   UIColorHexA(_hex_, 1.0)
 #endif
 
+// 所有的绘画类型
+#define kUkeDrawingAllTypes  @[@"brush", @"line", @"ellipse", @"rectangle", @"texttool", @"eraser", @"eraserrectangle", @"linearrow", @"triangle", @"star"]
+
 typedef NS_ENUM(NSInteger, UkeDrawingMode) {
     UkeDrawingModeUnKnown = -1,
     UkeDrawingModeBrush = 0, //! 线

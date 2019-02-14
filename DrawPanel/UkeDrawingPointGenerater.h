@@ -22,15 +22,6 @@ NS_ASSUME_NONNULL_BEGIN
 + (NSArray<NSArray *> *)ellipsePoints4;
 + (NSArray<NSArray *> *)ellipsePoints5;
 
-
-
-
-
-
-
-
-+ (NSArray *)allDrawTypes;
-
 @end
 
 NS_ASSUME_NONNULL_END

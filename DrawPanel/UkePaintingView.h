@@ -32,11 +32,6 @@ NS_ASSUME_NONNULL_BEGIN
                      color:(UIColor *)color
               drawingState:(UkeDrawingState)state;
 
-
-- (void)drawWithPoints:(NSArray<NSValue *> *)points
-                 width:(CGFloat)width
-                 color:(UIColor *)color;
-
 @end
 
 NS_ASSUME_NONNULL_END
