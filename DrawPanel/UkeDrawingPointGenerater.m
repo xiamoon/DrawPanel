@@ -60,6 +60,8 @@
         start = @[@"252.5",@"130.83333333333334",@"14",@"line",@[@"2",@"#EF4C4F",@"0"]];
     }else if (mode == UkeDrawingModeEraserRectangle) {
         start = @[@"90.83333333333334",@"100.83333333333334",@"14",@"eraserrectangle",@[]];
+    }else if (mode == UkeDrawingModeStar) {
+        start = @[@"252.5",@"130.83333333333334",@"14",@"star",@[@"2",@"#EF4C4F",@"0"]];
     }
     
     NSArray *point1 = @[@"254.16666666666669",@"133.33333333333334",@"14"];

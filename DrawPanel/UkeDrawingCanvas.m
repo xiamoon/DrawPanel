@@ -52,7 +52,7 @@
         [self testDrawWithPoints:[UkeDrawingPointGenerater lineArrowWholePoints]];
 
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [self testDrawWithPoints:[UkeDrawingPointGenerater startPoints:UkeDrawingModeEraserRectangle]];
+            [self testDrawWithPoints:[UkeDrawingPointGenerater startPoints:UkeDrawingModeStar]];
         });
         
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
@@ -60,15 +60,16 @@
         });
 
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            NSMutableArray *points = [NSMutableArray array];
-            NSArray *end = @[@"302",@"190",@"14",@"true"];
-            [points addObject:end];
-            [self testDrawWithPoints:points];
+            [self testDrawWithPoints:[UkeDrawingPointGenerater points3]];
         });
 
-//        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(4.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-//            [self testDrawWithPoints:[UkeDrawingPointGenerater endPoints]];
-//        });
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [self testDrawWithPoints:[UkeDrawingPointGenerater points4]];
+        });
+
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(4.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [self testDrawWithPoints:[UkeDrawingPointGenerater endPoints]];
+        });
     }
     return self;
 }

@@ -52,6 +52,9 @@ static double degreeFromRadian(double radian) {
 }
 
 - (void)drawWithStartPoint:(CGPoint)startPoint currentPoint:(CGPoint)currentPoint {
+    // test
+    _currentDrawingMode = UkeDrawingModeStar;
+    
     if (_currentDrawingMode == UkeDrawingModeBrush) { //! 画曲线
         if (_drawingState == UkeDrawingStateStart) {
             CAShapeLayer *layer = [[CAShapeLayer alloc] init];
@@ -315,6 +318,62 @@ static double degreeFromRadian(double radian) {
         }
         
         _currentLayer.path = _currentPath.CGPath;
+    }else if (_currentDrawingMode == UkeDrawingModeStar) { // 五角星
+        // 设O为圆心，A（上顶点）、B、C、D、E为外点(顺时针方向)，F（右上角内点）、G、H、I、J为内点（顺时针方向）。每个外角为36度
+        // 大圆圆心
+        CGPoint O = startPoint;
+        // 大圆半径
+        CGFloat radius_max = fabs(2*(currentPoint.x-O.x));
+        
+        CGPoint A = CGPointMake(O.x, O.y-radius_max);
+        CGPoint B = CGPointMake(O.x+radius_max*cos(radianFromDegree(18.0)), O.y-radius_max*sin(radianFromDegree(18.0)));
+        CGPoint C = CGPointMake(O.x+radius_max*sin(radianFromDegree(36.0)), O.y+radius_max*cos(radianFromDegree(36.0)));
+        CGPoint D = CGPointMake(O.x-radius_max*sin(radianFromDegree(36.0)), C.y);
+        CGPoint E = CGPointMake(O.x-radius_max*cos(radianFromDegree(18.0)), B.y);
+        
+        // 小圆半径
+        CGFloat radius_min = radius_max*sin(radianFromDegree(18.0))/cos(radianFromDegree(36.0));
+        
+        CGPoint F = CGPointMake(O.x+radius_max*sin(radianFromDegree(18.0))*tan(radianFromDegree(36.0)), B.y);
+        CGPoint G = CGPointMake(O.x+radius_min*cos(radianFromDegree(18.0)), O.y+radius_min*sin(radianFromDegree(18.0)));
+        CGPoint H = CGPointMake(O.x, O.y+radius_min);
+        CGPoint I = CGPointMake(O.x-radius_min*cos(radianFromDegree(18.0)), G.y);
+        CGPoint J = CGPointMake(O.x-radius_max*sin(radianFromDegree(18.0))*tan(radianFromDegree(36.0)), F.y);
+        
+        UIBezierPath *path = [UIBezierPath bezierPath];
+        [path moveToPoint:A];
+        [path addLineToPoint:F];
+        [path addLineToPoint:B];
+        [path addLineToPoint:G];
+        [path addLineToPoint:C];
+        [path addLineToPoint:H];
+        [path addLineToPoint:D];
+        [path addLineToPoint:I];
+        [path addLineToPoint:E];
+        [path addLineToPoint:J];
+        [path addLineToPoint:A];
+
+        _currentPath = path;
+        
+        if (_drawingState == UkeDrawingStateStart) {
+            CAShapeLayer *layer = [[CAShapeLayer alloc] init];
+            layer.backgroundColor = [UIColor clearColor].CGColor;
+            layer.fillColor = [UIColor clearColor].CGColor;
+            layer.strokeColor = [UIColor redColor].CGColor;
+            layer.fillRule = @"even-odd";
+            layer.frame = self.frame;
+            [self.layer addSublayer:layer];
+            
+            _currentLayer = layer;
+        }else if (_drawingState == UkeDrawingStateEnd) {
+            UkePathInfo *pathInfo = [[UkePathInfo alloc] init];
+            pathInfo.path = _currentPath;
+            pathInfo.blendMode = kCGBlendModeNormal;
+            
+            [_paths addObject:pathInfo];
+        }
+        
+        _currentLayer.path = _currentPath.CGPath;
     }
 }
 
@@ -340,13 +399,13 @@ static double degreeFromRadian(double radian) {
     }
     
     if (!_currentLayer && _currentDrawingMode != UkeDrawingModeEraser) {
-        [self createLayerWithWidth:width color:color startPoint:startPoint isEraserRectangle:(_currentDrawingMode == UkeDrawingModeEraserRectangle)];
+        [self createLayerWithWidth:width color:color isEraserRectangle:(_currentDrawingMode == UkeDrawingModeEraserRectangle)];
     }
     
     if (_currentDrawingMode == UkeDrawingModeBrush) { // 线
         if (!_currentPath) {
             _currentPath = [UIBezierPath bezierPath];
-            [_currentPath moveToPoint:startPoint.CGPointValue];
+            [_currentPath moveToPoint:_startPoint];
         }
         
         if (points.count) {
@@ -383,8 +442,10 @@ static double degreeFromRadian(double radian) {
             [_currentPath addLineToPoint:CGPointMake(point2.x, point2.y)];
             [_currentPath closePath];
         }
+    }else if (_currentDrawingMode == UkeDrawingModeStar) { // 五角星
+        [self drawStarWithStartPoint:_startPoint otherPoints:points];
     }else if (_currentDrawingMode == UkeDrawingModeLineArrow) { // 箭头
-        [self drawLineArrowWithStartPoint:startPoint otherPoints:points width:width color:color];
+        [self drawLineArrowWithStartPoint:_startPoint otherPoints:points width:width color:color];
     }else if (_currentDrawingMode == UkeDrawingModeEraser) { // 橡皮擦
         if (!_currentPath) {
             _currentPath = [UIBezierPath bezierPath];
@@ -451,8 +512,53 @@ static double degreeFromRadian(double radian) {
     }
 }
 
+// 画五角星
+- (void)drawStarWithStartPoint:(CGPoint)startPoint
+                        otherPoints:(NSArray<NSValue *> *)points {
+    // 设O为圆心，A（上顶点）、B、C、D、E为外点(顺时针方向)，F（右上角内点）、G、H、I、J为内点（顺时针方向）。每个外角为36度
+    // 大圆圆心
+    CGPoint O = startPoint;
+    // 大圆半径
+    if (points.count == 0) return;
+    
+    for (NSValue *value in points) {
+        CGPoint currentPoint = value.CGPointValue;
+        CGFloat radius_max = fabs(2*(currentPoint.x-O.x));
+        
+        CGPoint A = CGPointMake(O.x, O.y-radius_max);
+        CGPoint B = CGPointMake(O.x+radius_max*cos(radianFromDegree(18.0)), O.y-radius_max*sin(radianFromDegree(18.0)));
+        CGPoint C = CGPointMake(O.x+radius_max*sin(radianFromDegree(36.0)), O.y+radius_max*cos(radianFromDegree(36.0)));
+        CGPoint D = CGPointMake(O.x-radius_max*sin(radianFromDegree(36.0)), C.y);
+        CGPoint E = CGPointMake(O.x-radius_max*cos(radianFromDegree(18.0)), B.y);
+        
+        // 小圆半径
+        CGFloat radius_min = radius_max*sin(radianFromDegree(18.0))/cos(radianFromDegree(36.0));
+        
+        CGPoint F = CGPointMake(O.x+radius_max*sin(radianFromDegree(18.0))*tan(radianFromDegree(36.0)), B.y);
+        CGPoint G = CGPointMake(O.x+radius_min*cos(radianFromDegree(18.0)), O.y+radius_min*sin(radianFromDegree(18.0)));
+        CGPoint H = CGPointMake(O.x, O.y+radius_min);
+        CGPoint I = CGPointMake(O.x-radius_min*cos(radianFromDegree(18.0)), G.y);
+        CGPoint J = CGPointMake(O.x-radius_max*sin(radianFromDegree(18.0))*tan(radianFromDegree(36.0)), F.y);
+        
+        UIBezierPath *path = [UIBezierPath bezierPath];
+        [path moveToPoint:A];
+        [path addLineToPoint:F];
+        [path addLineToPoint:B];
+        [path addLineToPoint:G];
+        [path addLineToPoint:C];
+        [path addLineToPoint:H];
+        [path addLineToPoint:D];
+        [path addLineToPoint:I];
+        [path addLineToPoint:E];
+        [path addLineToPoint:J];
+        [path addLineToPoint:A];
+        
+        _currentPath = path;
+    }
+}
 
-- (void)drawLineArrowWithStartPoint:(NSValue *)startPoint
+// 画箭头
+- (void)drawLineArrowWithStartPoint:(CGPoint)startPoint
                  otherPoints:(NSArray<NSValue *> *)points
                        width:(CGFloat)width
                        color:(UIColor *)color {
@@ -464,11 +570,10 @@ static double degreeFromRadian(double radian) {
         [_currentLayer.sublayers.lastObject removeFromSuperlayer];
     }
     
-    CGPoint firstPoint = [startPoint CGPointValue];
     CGPoint endPoint = [points.lastObject CGPointValue];
     
-    CGFloat a = endPoint.x-firstPoint.x;
-    CGFloat b = firstPoint.y-endPoint.y;
+    CGFloat a = endPoint.x-startPoint.x;
+    CGFloat b = startPoint.y-endPoint.y;
     CGFloat c = sqrt(a*a+b*b);
     CGFloat degreeB = degreeFromRadian(asin(fabs(b)/c));
     
@@ -497,7 +602,7 @@ static double degreeFromRadian(double radian) {
     // 线段
     CAShapeLayer *lineLayer = [[CAShapeLayer alloc] init];
     lineLayer.anchorPoint = CGPointMake(0, 0.5);
-    lineLayer.position = firstPoint;
+    lineLayer.position = startPoint;
     lineLayer.backgroundColor = [UIColor clearColor].CGColor;
     lineLayer.lineWidth = lineWidth;
     lineLayer.fillColor = [UIColor clearColor].CGColor;
@@ -534,6 +639,7 @@ static double degreeFromRadian(double radian) {
     [CATransaction commit];
 }
 
+// 画文字
 - (void)drawTextWithText:(NSString *)text
               startPoint:(NSValue *)startPoint
                    fontSize:(CGFloat)fontSize
@@ -559,7 +665,6 @@ static double degreeFromRadian(double radian) {
 
 - (void)createLayerWithWidth:(CGFloat)width
                                       color:(UIColor *)color
-                  startPoint:(NSValue *)startPoint
            isEraserRectangle:(BOOL)isEraserRectangle {
     CAShapeLayer *layer = [[CAShapeLayer alloc] init];
     layer.backgroundColor = [UIColor clearColor].CGColor;
