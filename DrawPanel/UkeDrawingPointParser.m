@@ -34,13 +34,13 @@
         
         if (singlePoint.count <= 3) { // 中间点数据
             if (singlePoint.count >= 2) {
-                NSValue *point = [NSValue valueWithCGPoint:CGPointMake([singlePoint[0] floatValue], [singlePoint[1] floatValue])];
+                NSValue *point = [NSValue valueWithCGPoint:CGPointMake([singlePoint[0] floatValue]*self.scaleX, [singlePoint[1] floatValue]*self.scaleY)];
                 [drawingPoints addObject:point];
             }
         }else {
             drawType = singlePoint[3];
             if ([kUkeDrawingAllTypes containsObject:drawType]) { // 起始点数据
-                NSValue *point = [NSValue valueWithCGPoint:CGPointMake([singlePoint[0] floatValue], [singlePoint[1] floatValue])];
+                NSValue *point = [NSValue valueWithCGPoint:CGPointMake([singlePoint[0] floatValue]*self.scaleX, [singlePoint[1] floatValue]*self.scaleY)];
                 startPoint = point;
                 
                 if (singlePoint.count >= 5) {
@@ -53,8 +53,8 @@
                         if ([drawType isEqualToString:kUkeDrawingAllTypes[8]]) { // 三角形
                             // 三角形的剩下两个点在drawInfo里面
                             if (drawInfo.count >= 6) {
-                                NSValue *point1 = [NSValue valueWithCGPoint:CGPointMake([drawInfo[2] floatValue], [drawInfo[3] floatValue])];
-                                NSValue *point2 = [NSValue valueWithCGPoint:CGPointMake([drawInfo[4] floatValue], [drawInfo[5] floatValue])];
+                                NSValue *point1 = [NSValue valueWithCGPoint:CGPointMake([drawInfo[2] floatValue]*self.scaleX, [drawInfo[3] floatValue]*self.scaleY)];
+                                NSValue *point2 = [NSValue valueWithCGPoint:CGPointMake([drawInfo[4] floatValue]*self.scaleX, [drawInfo[5] floatValue]*self.scaleY)];
                                 
                                 [drawingPoints addObject:point1];
                                 [drawingPoints addObject:point2];
@@ -62,7 +62,7 @@
                         } else if ([drawType isEqualToString:kUkeDrawingAllTypes[7]]) { // 箭头
                             // 箭头的终点在drawInfo里面
                             if (drawInfo.count >= 4) {
-                                NSValue *endPoint = [NSValue valueWithCGPoint:CGPointMake([drawInfo[2] floatValue], [drawInfo[3] floatValue])];
+                                NSValue *endPoint = [NSValue valueWithCGPoint:CGPointMake([drawInfo[2] floatValue]*self.scaleX, [drawInfo[3] floatValue]*self.scaleY)];
                                 [drawingPoints addObject:endPoint];
                             }
                         } else if ([drawType isEqualToString:kUkeDrawingAllTypes[4]]) { // 文字
@@ -70,7 +70,7 @@
                                 text = singlePoint[6];
                             }
                         } else {
-                            NSValue *point = [NSValue valueWithCGPoint:CGPointMake([singlePoint[0] floatValue], [singlePoint[1] floatValue])];
+                            NSValue *point = [NSValue valueWithCGPoint:CGPointMake([singlePoint[0] floatValue]*self.scaleX, [singlePoint[1] floatValue]*self.scaleY)];
                             [drawingPoints addObject:point];
                         }
                     }else {
@@ -81,7 +81,7 @@
                 drawType = nil;
                 terminalFlag = singlePoint[3];
                 if ([terminalFlag isEqualToString:@"true"]) { // 终止点数据
-                    NSValue *point = [NSValue valueWithCGPoint:CGPointMake([singlePoint[0] floatValue], [singlePoint[1] floatValue])];
+                    NSValue *point = [NSValue valueWithCGPoint:CGPointMake([singlePoint[0] floatValue]*self.scaleX, [singlePoint[1] floatValue]*self.scaleY)];
                     [drawingPoints addObject:point];
                 }else {
                     terminalFlag = nil;

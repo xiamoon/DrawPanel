@@ -27,6 +27,7 @@
     self = [super init];
     if (self) {
         self.backgroundColor = [UIColor clearColor];
+        self.clipsToBounds = YES;
         
         _pointParser = [[UkeDrawingPointParser alloc] init];
         
@@ -41,6 +42,12 @@
     if (newSuperview) {
         _paintingView.frame = self.frame;
     }
+}
+
+- (void)didMoveToSuperview {
+    [super didMoveToSuperview];
+    _pointParser.scaleX = CGRectGetWidth(self.frame) / 800.0;
+    _pointParser.scaleY = CGRectGetHeight(self.frame) / 450.0;
 }
 
 - (UIImage *)currentContents {

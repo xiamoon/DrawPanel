@@ -25,6 +25,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, nullable) NSValue *startPoint;
 @property (nonatomic, strong, nullable) NSArray<NSValue *> *drawingPoints; // 不包含起始点
 
+//! x坐标缩放比
+@property (nonatomic, assign) CGFloat scaleX;
+//! y坐标缩放比
+@property (nonatomic, assign) CGFloat scaleY;
+
 - (void)parseWithPoints:(NSArray<NSArray *> *)points
              completion:(void(^)(UkeDrawingPointParser *parser))completionHandler;
 

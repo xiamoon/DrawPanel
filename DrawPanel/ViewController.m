@@ -126,7 +126,7 @@
     }
     CGPoint currentPoint = point;
     
-    _panDrawingMode = UkeDrawingModeEllipse;
+    _panDrawingMode = UkeDrawingModeEraserRectangle;
     
     UkeDrawingState drawingState = [self drawingStateFromGestureState:pan.state];
     [_panel.currentDrawingCanvas drawWithStartPoint:_panStartPoint currentPoint:currentPoint drawingState:drawingState drawingMode:_panDrawingMode];
