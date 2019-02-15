@@ -7,10 +7,8 @@
 //
 
 #import "UkeDrawingDisplayPanel.h"
-#import "UkeDrawingCanvas.h"
 
 @interface UkeDrawingDisplayPanel ()
-@property (nonatomic, assign) UkeDrawingMode currentDrawingMode;
 @property (nonatomic, strong) UkeDrawingCanvas *currentCanvas;
 //! 所有的绘画内容
 @property (nonatomic, strong) NSMutableArray<UIImage *> *allCanvas;
@@ -36,14 +34,6 @@
         // 创建画布
         [self createCanvas];
     }
-}
-
-- (void)switchDrawingMode:(UkeDrawingMode)drawingMode {
-    if (_currentDrawingMode == drawingMode) {
-        return;
-    }
-    _currentDrawingMode = drawingMode;
-    _currentCanvas.currentDrawingMode = drawingMode;
 }
 
 - (void)turnToNextPage {
@@ -83,7 +73,6 @@
         UIImage *cachedDrawedContents = _allCanvas[_currentIndex];
         [_currentCanvas setCurrentContents:cachedDrawedContents];
     }
-    _currentCanvas.currentDrawingMode = self.currentDrawingMode;
 }
 
 - (void)turnToPreviousPage {
@@ -109,7 +98,10 @@
     // 恢复缓存的画布内容
     UIImage *cachedDrawedContents = _allCanvas[_currentIndex];
     [_currentCanvas setCurrentContents:cachedDrawedContents];
-    _currentCanvas.currentDrawingMode = self.currentDrawingMode;
+}
+
+- (UkeDrawingCanvas *)currentDrawingCanvas {
+    return _currentCanvas;
 }
 
 - (UkeDrawingCanvas *)createCanvas {

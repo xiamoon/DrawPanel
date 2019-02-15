@@ -10,6 +10,7 @@
 #import "UkePathInfo.h"
 
 @interface UkePaintingView ()
+@property (nonatomic, assign) UkeDrawingMode currentDrawingMode;
 @property (nonatomic, assign) CGPoint startPoint;
 @property (nonatomic, strong) UIBezierPath *currentPath;
 @property (nonatomic, strong) UkePathInfo *currentPathInfo;
@@ -51,9 +52,13 @@ static double degreeFromRadian(double radian) {
     return (radian*180.0/M_PI);
 }
 
-- (void)drawWithStartPoint:(CGPoint)startPoint currentPoint:(CGPoint)currentPoint {
-    if (_currentDrawingMode == UkeDrawingModeBrush) { //! 画曲线
-        if (_drawingState == UkeDrawingStateStart) {
+
+- (void)drawWithStartPoint:(CGPoint)startPoint
+              currentPoint:(CGPoint)currentPoint
+              drawingState:(UkeDrawingState)drawingState
+               drawingMode:(UkeDrawingMode)drawingMode {
+    if (drawingMode == UkeDrawingModeBrush) { //! 画曲线
+        if (drawingState == UkeDrawingStateStart) {
             CAShapeLayer *layer = [[CAShapeLayer alloc] init];
             layer.backgroundColor = [UIColor clearColor].CGColor;
             layer.fillColor = [UIColor clearColor].CGColor;
@@ -75,13 +80,13 @@ static double degreeFromRadian(double radian) {
             [_currentPath addLineToPoint:currentPoint];
             _currentLayer.path = _currentPath.CGPath;
         }
-    }else if (_currentDrawingMode == UkeDrawingModeLine) { //! 画线段
+    }else if (drawingMode == UkeDrawingModeLine) { //! 画线段
         UIBezierPath *path = [UIBezierPath bezierPath];
         [path moveToPoint:startPoint];
         [path addLineToPoint:currentPoint];
         _currentPath = path;
         
-        if (_drawingState == UkeDrawingStateStart) {
+        if (drawingState == UkeDrawingStateStart) {
             CAShapeLayer *layer = [[CAShapeLayer alloc] init];
             layer.backgroundColor = [UIColor clearColor].CGColor;
             layer.fillColor = [UIColor clearColor].CGColor;
@@ -90,7 +95,7 @@ static double degreeFromRadian(double radian) {
             [self.layer addSublayer:layer];
             
             _currentLayer = layer;
-        }else if (_drawingState == UkeDrawingStateEnd) {
+        }else if (drawingState == UkeDrawingStateEnd) {
             UkePathInfo *pathInfo = [[UkePathInfo alloc] init];
             pathInfo.path = _currentPath;
             pathInfo.blendMode = kCGBlendModeNormal;
@@ -99,11 +104,11 @@ static double degreeFromRadian(double radian) {
         }
         
         _currentLayer.path = _currentPath.CGPath;
-    }else if (_currentDrawingMode == UkeDrawingModeEllipse) { //! 画圆
+    }else if (drawingMode == UkeDrawingModeEllipse) { //! 画圆
         UIBezierPath *path = [UIBezierPath bezierPathWithOvalInRect:CGRectMake(startPoint.x, startPoint.y, currentPoint.x-startPoint.x, currentPoint.y-startPoint.y)];
         _currentPath = path;
         
-        if (_drawingState == UkeDrawingStateStart) {
+        if (drawingState == UkeDrawingStateStart) {
             CAShapeLayer *layer = [[CAShapeLayer alloc] init];
             layer.backgroundColor = [UIColor clearColor].CGColor;
             layer.fillColor = [UIColor clearColor].CGColor;
@@ -112,7 +117,7 @@ static double degreeFromRadian(double radian) {
             [self.layer addSublayer:layer];
             
             _currentLayer = layer;
-        }else if (_drawingState == UkeDrawingStateEnd) {
+        }else if (drawingState == UkeDrawingStateEnd) {
             UkePathInfo *pathInfo = [[UkePathInfo alloc] init];
             pathInfo.path = _currentPath;
             pathInfo.blendMode = kCGBlendModeNormal;
@@ -121,11 +126,11 @@ static double degreeFromRadian(double radian) {
         }
         
         _currentLayer.path = _currentPath.CGPath;
-    }else if (_currentDrawingMode == UkeDrawingModeRectangle) { //! 画框
+    }else if (drawingMode == UkeDrawingModeRectangle) { //! 画框
         UIBezierPath *path = [UIBezierPath bezierPathWithRect:CGRectMake(startPoint.x, startPoint.y, currentPoint.x-startPoint.x, currentPoint.y-startPoint.y)];
         _currentPath = path;
         
-        if (_drawingState == UkeDrawingStateStart) {
+        if (drawingState == UkeDrawingStateStart) {
             CAShapeLayer *layer = [[CAShapeLayer alloc] init];
             layer.backgroundColor = [UIColor clearColor].CGColor;
             layer.fillColor = [UIColor clearColor].CGColor;
@@ -134,7 +139,7 @@ static double degreeFromRadian(double radian) {
             [self.layer addSublayer:layer];
             
             _currentLayer = layer;
-        }else if (_drawingState == UkeDrawingStateEnd) {
+        }else if (drawingState == UkeDrawingStateEnd) {
             UkePathInfo *pathInfo = [[UkePathInfo alloc] init];
             pathInfo.path = _currentPath;
             pathInfo.blendMode = kCGBlendModeNormal;
@@ -143,8 +148,8 @@ static double degreeFromRadian(double radian) {
         }
         
         _currentLayer.path = _currentPath.CGPath;
-    }else if (_currentDrawingMode == UkeDrawingModeEraser) { //! 画橡皮擦
-        if (_drawingState == UkeDrawingStateStart) {
+    }else if (drawingMode == UkeDrawingModeEraser) { //! 画橡皮擦
+        if (drawingState == UkeDrawingStateStart) {
             UIBezierPath *erasePath = [UIBezierPath bezierPath];
             [erasePath moveToPoint:startPoint];
             
@@ -173,11 +178,11 @@ static double degreeFromRadian(double radian) {
             self.layer.contents = (id)image.CGImage;
             UIGraphicsEndImageContext();
         }
-    }else if (_currentDrawingMode == UkeDrawingModeEraserRectangle) { //! 框选删除
+    }else if (drawingMode == UkeDrawingModeEraserRectangle) { //! 框选删除
         UIBezierPath *path = [UIBezierPath bezierPathWithRect:CGRectMake(startPoint.x, startPoint.y, currentPoint.x-startPoint.x, currentPoint.y-startPoint.y)];
         _currentPath = path;
         
-        if (_drawingState == UkeDrawingStateStart) {
+        if (drawingState == UkeDrawingStateStart) {
             CAShapeLayer *layer = [[CAShapeLayer alloc] init];
             layer.backgroundColor = [UIColor clearColor].CGColor;
             layer.fillColor = [[UIColor redColor] colorWithAlphaComponent:0.5].CGColor;
@@ -186,7 +191,7 @@ static double degreeFromRadian(double radian) {
             [self.layer addSublayer:layer];
             
             _currentLayer = layer;
-        }else if (_drawingState == UkeDrawingStateEnd) {
+        }else if (drawingState == UkeDrawingStateEnd) {
             UIGraphicsBeginImageContextWithOptions(self.frame.size, NO, [UIScreen mainScreen].scale);
             CGContextRef context = UIGraphicsGetCurrentContext();
             [self.layer renderInContext:context];
@@ -210,8 +215,8 @@ static double degreeFromRadian(double radian) {
             [_paths addObject:pathInfo];
         }
         _currentLayer.path = _currentPath.CGPath;
-    }else if (_currentDrawingMode == UkeDrawingModeLineArrow) { // 画箭头
-        if (_drawingState == UkeDrawingStateStart) {
+    }else if (drawingMode == UkeDrawingModeLineArrow) { // 画箭头
+        if (drawingState == UkeDrawingStateStart) {
             CAShapeLayer *layer = [[CAShapeLayer alloc] init];
             layer.backgroundColor = [UIColor clearColor].CGColor;
             layer.fillColor = [UIColor clearColor].CGColor;
@@ -289,7 +294,7 @@ static double degreeFromRadian(double radian) {
         lineLayer.bounds = CGRectMake(0, 0, c, lineLayerWidth);
         [lineLayer setAffineTransform:CGAffineTransformMakeRotation(degreeRotate/180.0*M_PI)];
         [CATransaction commit];
-    }else if (_currentDrawingMode == UkeDrawingModeTriangle) { // 画三角形
+    }else if (drawingMode == UkeDrawingModeTriangle) { // 画三角形
         UIBezierPath *path = [UIBezierPath bezierPath];
         [path moveToPoint:CGPointMake(startPoint.x, startPoint.y)];
         [path addLineToPoint:CGPointMake(currentPoint.x, currentPoint.y)];
@@ -297,7 +302,7 @@ static double degreeFromRadian(double radian) {
         [path closePath];
         _currentPath = path;
         
-        if (_drawingState == UkeDrawingStateStart) {
+        if (drawingState == UkeDrawingStateStart) {
             CAShapeLayer *layer = [[CAShapeLayer alloc] init];
             layer.backgroundColor = [UIColor clearColor].CGColor;
             layer.fillColor = [UIColor clearColor].CGColor;
@@ -306,7 +311,7 @@ static double degreeFromRadian(double radian) {
             [self.layer addSublayer:layer];
             
             _currentLayer = layer;
-        }else if (_drawingState == UkeDrawingStateEnd) {
+        }else if (drawingState == UkeDrawingStateEnd) {
             UkePathInfo *pathInfo = [[UkePathInfo alloc] init];
             pathInfo.path = _currentPath;
             pathInfo.blendMode = kCGBlendModeNormal;
@@ -315,7 +320,7 @@ static double degreeFromRadian(double radian) {
         }
         
         _currentLayer.path = _currentPath.CGPath;
-    }else if (_currentDrawingMode == UkeDrawingModeStar) { // 五角星
+    }else if (drawingMode == UkeDrawingModeStar) { // 五角星
         // 设O为圆心，A（上顶点）、B、C、D、E为外点(顺时针方向)，F（右上角内点）、G、H、I、J为内点（顺时针方向）。每个外角为36度
         // 大圆圆心
         CGPoint O = startPoint;
@@ -352,7 +357,7 @@ static double degreeFromRadian(double radian) {
 
         _currentPath = path;
         
-        if (_drawingState == UkeDrawingStateStart) {
+        if (drawingState == UkeDrawingStateStart) {
             CAShapeLayer *layer = [[CAShapeLayer alloc] init];
             layer.backgroundColor = [UIColor clearColor].CGColor;
             layer.fillColor = [UIColor clearColor].CGColor;
@@ -362,7 +367,7 @@ static double degreeFromRadian(double radian) {
             [self.layer addSublayer:layer];
             
             _currentLayer = layer;
-        }else if (_drawingState == UkeDrawingStateEnd) {
+        }else if (drawingState == UkeDrawingStateEnd) {
             UkePathInfo *pathInfo = [[UkePathInfo alloc] init];
             pathInfo.path = _currentPath;
             pathInfo.blendMode = kCGBlendModeNormal;
@@ -385,9 +390,8 @@ static double degreeFromRadian(double radian) {
         _currentDrawingMode = drawingMode;
     }
     
-    _drawingState = state;
     if (startPoint && points.count == 0) {
-        _drawingState = UkeDrawingStateStart;
+        state = UkeDrawingStateStart;
     }
     
     if (startPoint) {
@@ -478,7 +482,7 @@ static double degreeFromRadian(double radian) {
             }
         }
         
-        if (_drawingState == UkeDrawingStateEnd) {
+        if (state == UkeDrawingStateEnd) {
             UIGraphicsBeginImageContextWithOptions(self.frame.size, NO, [UIScreen mainScreen].scale);
             CGContextRef context = UIGraphicsGetCurrentContext();
             [self.layer renderInContext:context];
@@ -502,7 +506,7 @@ static double degreeFromRadian(double radian) {
         _currentLayer.path = _currentPath.CGPath;
     }
     
-    if (_drawingState == UkeDrawingStateEnd) {
+    if (state == UkeDrawingStateEnd) {
         _currentLayer = nil;
         _currentPath = nil;
     }
@@ -676,6 +680,10 @@ static double degreeFromRadian(double radian) {
     [self.layer addSublayer:layer];
     
     _currentLayer = layer;
+}
+
+- (void)dealloc {
+    NSLog(@"paintingView销毁");
 }
     
 @end

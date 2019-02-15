@@ -8,15 +8,19 @@
 
 #import <UIKit/UIKit.h>
 #import "UkeDrawingConstants.h"
+#import "UkeDrawingCanvas.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface UkeDrawingDisplayPanel : UIView
 
-- (void)switchDrawingMode:(UkeDrawingMode)drawingMode;
-
+// 翻到下一页
 - (void)turnToNextPage;
+// 翻到上一页
 - (void)turnToPreviousPage;
+
+//! 当前画布。每一页都对应一个单独的画布
+@property (nonatomic, strong) UkeDrawingCanvas *currentDrawingCanvas;
 
 @end
 

@@ -12,10 +12,20 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface UkeDrawingCanvas : UIView
-@property (nonatomic, assign) UkeDrawingMode currentDrawingMode;
-
 //! 当前绘画内容
 @property (nonatomic, strong) UIImage *currentContents;
+
+#pragma mark - 数据点驱动绘画
+//! 服务器数据点驱动绘画
+- (void)drawWithPoints:(NSArray<NSArray *> *)points;
+
+
+#pragma mark - 手势驱动绘画
+//! 手绘时调用这个方法
+- (void)drawWithStartPoint:(CGPoint)startPoint
+              currentPoint:(CGPoint)currentPoint
+              drawingState:(UkeDrawingState)drawingState
+               drawingMode:(UkeDrawingMode)drawingMode;
 
 @end
 

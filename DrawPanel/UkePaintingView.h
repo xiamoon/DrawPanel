@@ -13,15 +13,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface UkePaintingView : UIView
 
-@property (nonatomic, assign) UkeDrawingMode currentDrawingMode;
-@property (nonatomic, assign) UkeDrawingState drawingState;
-
 //! 当前绘画内容
 @property (nonatomic, strong) UIImage *currentContents;
 
 //! 手绘时调用这个方法
 - (void)drawWithStartPoint:(CGPoint)startPoint
-              currentPoint:(CGPoint)currentPoint;
+              currentPoint:(CGPoint)currentPoint
+              drawingState:(UkeDrawingState)drawingState
+               drawingMode:(UkeDrawingMode)drawingMode;
 
 
 //! 服务端数据驱动绘制时调用这个接口

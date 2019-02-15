@@ -8,7 +8,6 @@
 
 #import "UkeDrawingCanvas.h"
 #import "UkePaintingView.h"
-#import "UkeDrawingPointGenerater.h"
 #import "UkeDrawingPointParser.h"
 
 @interface UkeDrawingCanvas ()
@@ -17,7 +16,6 @@
 @property (nonatomic, strong) UkePaintingView *paintingView;
 //! 绘画起始点
 @property (nonatomic, assign) CGPoint startPoint;
-
 //! 当前actionId
 @property (nonatomic, copy) NSString *currentAction;
 
@@ -34,42 +32,6 @@
         
         _paintingView = [[UkePaintingView alloc] init];
         [self addSubview:_paintingView];
-        
-        UIPanGestureRecognizer *pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePanGesture:)];
-        [self addGestureRecognizer:pan];
-        
-        // 画笔
-        [self testDrawWithPoints:[UkeDrawingPointGenerater startPoints:UkeDrawingModeLine]];
-        [self testDrawWithPoints:[UkeDrawingPointGenerater points2]];
-        [self testDrawWithPoints:[UkeDrawingPointGenerater points3]];
-        [self testDrawWithPoints:[UkeDrawingPointGenerater points4]];
-        [self testDrawWithPoints:[UkeDrawingPointGenerater endPoints]];
-        // 三角形
-        [self testDrawWithPoints:[UkeDrawingPointGenerater triangleWholePoints]];
-        // 文字
-        [self testDrawWithPoints:[UkeDrawingPointGenerater textWholePoints]];
-        // 箭头
-        [self testDrawWithPoints:[UkeDrawingPointGenerater lineArrowWholePoints]];
-
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [self testDrawWithPoints:[UkeDrawingPointGenerater startPoints:UkeDrawingModeStar]];
-        });
-        
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [self testDrawWithPoints:[UkeDrawingPointGenerater points2]];
-        });
-
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [self testDrawWithPoints:[UkeDrawingPointGenerater points3]];
-        });
-
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [self testDrawWithPoints:[UkeDrawingPointGenerater points4]];
-        });
-
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(4.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [self testDrawWithPoints:[UkeDrawingPointGenerater endPoints]];
-        });
     }
     return self;
 }
@@ -89,9 +51,7 @@
     [_paintingView setCurrentContents:currentContents];
 }
 
-
-#pragma mark - 数据点驱动绘画
-- (void)testDrawWithPoints:(NSArray<NSArray *> *)points {
+- (void)drawWithPoints:(NSArray<NSArray *> *)points {
     __weak typeof(self)weakSelf = self;
     [_pointParser parseWithPoints:points completion:^(UkeDrawingPointParser * _Nonnull parser) {
         if (parser.drawingMode == UkeDrawingModeText) {
@@ -102,50 +62,13 @@
     }];
 }
 
-
-#pragma mark - 手势驱动绘画
-
-- (void)handlePanGesture:(UIGestureRecognizer *)pan {
-    CGPoint point = [pan locationInView:self];
-    
-    if (pan.state == UIGestureRecognizerStateBegan) {
-        _startPoint = point;
-    }
-    CGPoint currentPoint = point;
-    
-    [self setCurrentDrawingState:[self drawingStateFromGestureState:pan.state]];
-    [self setPointWithStartPoint:_startPoint currentPoint:currentPoint];
+- (void)drawWithStartPoint:(CGPoint)startPoint
+              currentPoint:(CGPoint)currentPoint
+              drawingState:(UkeDrawingState)drawingState
+               drawingMode:(UkeDrawingMode)drawingMode {
+    [_paintingView drawWithStartPoint:startPoint currentPoint:currentPoint drawingState:drawingState drawingMode:drawingMode];
 }
 
-- (void)setCurrentDrawingState:(UkeDrawingState)state {
-    [_paintingView setDrawingState:state];
-}
-
-- (void)setPointWithStartPoint:(CGPoint)startPoint
-                            currentPoint:(CGPoint)currentPoint {
-    [_paintingView drawWithStartPoint:startPoint currentPoint:currentPoint];
-}
-
-- (void)setCurrentDrawingMode:(UkeDrawingMode)currentDrawingMode {
-    _currentDrawingMode = currentDrawingMode;
-    _paintingView.currentDrawingMode = currentDrawingMode;
-}
-
-- (UkeDrawingState)drawingStateFromGestureState:(UIGestureRecognizerState)state {
-    UkeDrawingState drawingState = UkeDrawingStateUnknown;
-    if (state == UIGestureRecognizerStateBegan) {
-        drawingState = UkeDrawingStateStart;
-    }else if (state == UIGestureRecognizerStateChanged) {
-        drawingState = UkeDrawingStateDrawing;
-    }else if (state == UIGestureRecognizerStateEnded ||
-              state == UIGestureRecognizerStateCancelled ||
-              state == UIGestureRecognizerStateFailed) {
-        drawingState = UkeDrawingStateEnd;
-    }
-    return drawingState;
-}
-
- 
 - (void)dealloc {
     NSLog(@"手绘板canvas销毁");
 }
