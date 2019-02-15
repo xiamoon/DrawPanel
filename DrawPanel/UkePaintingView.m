@@ -46,15 +46,12 @@ static double radianFromDegree(double degree) {
     return (degree/180.0*M_PI);
 }
 
-// 弧度转角度
+//! 弧度转角度
 static double degreeFromRadian(double radian) {
     return (radian*180.0/M_PI);
 }
 
 - (void)drawWithStartPoint:(CGPoint)startPoint currentPoint:(CGPoint)currentPoint {
-    // test
-    _currentDrawingMode = UkeDrawingModeStar;
-    
     if (_currentDrawingMode == UkeDrawingModeBrush) { //! 画曲线
         if (_drawingState == UkeDrawingStateStart) {
             CAShapeLayer *layer = [[CAShapeLayer alloc] init];
@@ -213,7 +210,7 @@ static double degreeFromRadian(double radian) {
             [_paths addObject:pathInfo];
         }
         _currentLayer.path = _currentPath.CGPath;
-    }else if (_currentDrawingMode == UkeDrawingModeLineArrow) {
+    }else if (_currentDrawingMode == UkeDrawingModeLineArrow) { // 画箭头
         if (_drawingState == UkeDrawingStateStart) {
             CAShapeLayer *layer = [[CAShapeLayer alloc] init];
             layer.backgroundColor = [UIColor clearColor].CGColor;
@@ -292,7 +289,7 @@ static double degreeFromRadian(double radian) {
         lineLayer.bounds = CGRectMake(0, 0, c, lineLayerWidth);
         [lineLayer setAffineTransform:CGAffineTransformMakeRotation(degreeRotate/180.0*M_PI)];
         [CATransaction commit];
-    }else if (_currentDrawingMode == UkeDrawingModeTriangle) {
+    }else if (_currentDrawingMode == UkeDrawingModeTriangle) { // 画三角形
         UIBezierPath *path = [UIBezierPath bezierPath];
         [path moveToPoint:CGPointMake(startPoint.x, startPoint.y)];
         [path addLineToPoint:CGPointMake(currentPoint.x, currentPoint.y)];
@@ -376,7 +373,6 @@ static double degreeFromRadian(double radian) {
         _currentLayer.path = _currentPath.CGPath;
     }
 }
-
 
 
 - (void)drawWithMode:(UkeDrawingMode)drawingMode
