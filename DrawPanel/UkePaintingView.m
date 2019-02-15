@@ -383,6 +383,8 @@ static double degreeFromRadian(double radian) {
             [_currentPath addLineToPoint:CGPointMake(point2.x, point2.y)];
             [_currentPath closePath];
         }
+    }else if (_currentDrawingMode == UkeDrawingModeLineArrow) { // 箭头
+        [self drawLineArrowWithStartPoint:startPoint otherPoints:points width:width color:color];
     }else if (_currentDrawingMode == UkeDrawingModeEraser) { // 橡皮擦
         if (!_currentPath) {
             _currentPath = [UIBezierPath bezierPath];
@@ -438,6 +440,7 @@ static double degreeFromRadian(double radian) {
         }
     }
     
+    
     if (_currentDrawingMode != UkeDrawingModeEraser) {
         _currentLayer.path = _currentPath.CGPath;
     }
@@ -446,6 +449,89 @@ static double degreeFromRadian(double radian) {
         _currentLayer = nil;
         _currentPath = nil;
     }
+}
+
+
+- (void)drawLineArrowWithStartPoint:(NSValue *)startPoint
+                 otherPoints:(NSArray<NSValue *> *)points
+                       width:(CGFloat)width
+                       color:(UIColor *)color {
+    if (points.count != 1) {
+        return;
+    }
+    
+    while (_currentLayer.sublayers.count) {
+        [_currentLayer.sublayers.lastObject removeFromSuperlayer];
+    }
+    
+    CGPoint firstPoint = [startPoint CGPointValue];
+    CGPoint endPoint = [points.lastObject CGPointValue];
+    
+    CGFloat a = endPoint.x-firstPoint.x;
+    CGFloat b = firstPoint.y-endPoint.y;
+    CGFloat c = sqrt(a*a+b*b);
+    CGFloat degreeB = degreeFromRadian(asin(fabs(b)/c));
+    
+    CGFloat degreeRotate = 0;
+    if (a>0 && b>=0) { // 第一象限
+        degreeRotate = 360.0-degreeB;
+    }else if (a<=0 && b>=0) { // 第二象限
+        degreeRotate = 180.0+degreeB;
+    }else if (a<=0 && b<0) { // 第三象限
+        degreeRotate = 180.0-degreeB;
+    }else if (a>0 && b<=0) {// 第四象限
+        degreeRotate = degreeB;
+    }
+    
+    // 箭头夹角（小于90度）
+    CGFloat arrowDegree = 60.0;
+    // 一半箭头的夹角
+    CGFloat singleArrowDegree = arrowDegree*0.5;
+    // 线宽
+    CGFloat lineWidth = width;
+    // n决定箭头两边的长短。n越大，箭头两边越长，反之，越短
+    CGFloat n = lineWidth*0.8;
+    // 线加上箭头总体宽度，即下面lineLayer的宽度
+    CGFloat lineLayerWidth = 2*n+2*lineWidth*cos(radianFromDegree(singleArrowDegree)) +lineWidth;
+    
+    // 线段
+    CAShapeLayer *lineLayer = [[CAShapeLayer alloc] init];
+    lineLayer.anchorPoint = CGPointMake(0, 0.5);
+    lineLayer.position = firstPoint;
+    lineLayer.backgroundColor = [UIColor clearColor].CGColor;
+    lineLayer.lineWidth = lineWidth;
+    lineLayer.fillColor = [UIColor clearColor].CGColor;
+    lineLayer.strokeColor = color.CGColor;
+    [_currentLayer addSublayer:lineLayer];
+    
+    UIBezierPath *linePath = [UIBezierPath bezierPath];
+    [linePath moveToPoint:CGPointMake(0, lineLayerWidth*0.5)];
+    [linePath addLineToPoint:CGPointMake(c-0.5*lineWidth/sin(radianFromDegree(singleArrowDegree)), lineLayerWidth*0.5)];
+    lineLayer.path = linePath.CGPath;
+    
+    // 箭头
+    CAShapeLayer *arrowLayer = [[CAShapeLayer alloc] init];
+    arrowLayer.bounds = CGRectMake(0, 0, lineLayerWidth, lineLayerWidth);
+    arrowLayer.position = CGPointMake(c-lineLayerWidth*0.5, lineLayerWidth*0.5);
+    arrowLayer.backgroundColor = [UIColor clearColor].CGColor;
+    arrowLayer.lineWidth = lineWidth;
+    arrowLayer.fillColor = color.CGColor;
+    arrowLayer.strokeColor = color.CGColor;
+    [lineLayer addSublayer:arrowLayer];
+    
+    UIBezierPath *arrowPath = [UIBezierPath bezierPath];
+    [arrowPath moveToPoint:CGPointMake(0.5*lineWidth*sin(radianFromDegree(singleArrowDegree)), 0.5*lineWidth*cos(radianFromDegree(singleArrowDegree)))];
+    [arrowPath addLineToPoint:CGPointMake(lineLayerWidth-0.5*lineWidth/sin(radianFromDegree(singleArrowDegree)), lineLayerWidth*0.5)];
+    [arrowPath addLineToPoint:CGPointMake(0.5*lineWidth*sin(radianFromDegree(singleArrowDegree)), lineLayerWidth-0.5*lineWidth*cos(radianFromDegree(singleArrowDegree)))];
+    [arrowPath closePath];
+    arrowLayer.path = arrowPath.CGPath;
+    
+    // 整体拉长和旋转
+    [CATransaction begin];
+    [CATransaction setDisableActions:YES];
+    lineLayer.bounds = CGRectMake(0, 0, c, lineLayerWidth);
+    [lineLayer setAffineTransform:CGAffineTransformMakeRotation(degreeRotate/180.0*M_PI)];
+    [CATransaction commit];
 }
 
 - (void)drawTextWithText:(NSString *)text
@@ -460,10 +546,11 @@ static double degreeFromRadian(double radian) {
     CGPoint point = startPoint.CGPointValue;
     
     CATextLayer *textLayer = [[CATextLayer alloc] init];
+    textLayer.contentsScale = [UIScreen mainScreen].scale;
     textLayer.backgroundColor = [UIColor clearColor].CGColor;
     NSMutableAttributedString *attri = [[NSMutableAttributedString alloc] initWithString:text];
     [attri addAttribute:NSForegroundColorAttributeName value:color range:NSMakeRange(0, text.length)];
-    [attri addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:fontSize] range:NSMakeRange(0, text.length)];
+    [attri addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:fontSize weight:UIFontWeightSemibold] range:NSMakeRange(0, text.length)];
     CGSize textSize = [attri boundingRectWithSize:self.bounds.size options:0 context:NULL].size;
     textLayer.frame = CGRectMake(point.x, point.y, textSize.width, textSize.height);
     textLayer.string = attri;
@@ -488,14 +575,6 @@ static double degreeFromRadian(double radian) {
     [self.layer addSublayer:layer];
     
     _currentLayer = layer;
-//
-//    UkePathInfo *pathInfo = [[UkePathInfo alloc] init];
-//    pathInfo.lineWidth = width;
-//    pathInfo.lineColor = color;
-//    pathInfo.blendMode = kCGBlendModeNormal;
-//    [_paths addObject:pathInfo];
-//
-//    _currentPathInfo = pathInfo;
 }
     
 @end

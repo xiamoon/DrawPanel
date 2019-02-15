@@ -59,6 +59,12 @@
                                 [drawingPoints addObject:point1];
                                 [drawingPoints addObject:point2];
                             }
+                        } else if ([drawType isEqualToString:kUkeDrawingAllTypes[7]]) { // 箭头
+                            // 箭头的终点在drawInfo里面
+                            if (drawInfo.count >= 4) {
+                                NSValue *endPoint = [NSValue valueWithCGPoint:CGPointMake([drawInfo[2] floatValue], [drawInfo[3] floatValue])];
+                                [drawingPoints addObject:endPoint];
+                            }
                         } else if ([drawType isEqualToString:kUkeDrawingAllTypes[4]]) { // 文字
                             if (singlePoint.count >= 7) {
                                 text = singlePoint[6];

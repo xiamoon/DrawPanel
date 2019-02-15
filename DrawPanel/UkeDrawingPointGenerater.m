@@ -158,9 +158,17 @@
 
 + (NSArray<NSArray *> *)textWholePoints {
     NSMutableArray *points = [NSMutableArray array];
-    NSArray *point = @[@"260",@"185",@"14",@"texttool",@[@"14",@"#ef4c4f"],@"true",@"看空间"];
+    NSArray *point = @[@"260",@"185",@"14",@"texttool",@[@"15",@"#ef4c4f"],@"true",@"看空间"];
     [points addObject:point];
     return points.copy;
 }
+
++ (NSArray<NSArray *> *)lineArrowWholePoints {
+    NSMutableArray *points = [NSMutableArray array];
+    NSArray *point = @[@"310",@"220",@"14",@"linearrow",@[@"2",@"#ef4c4f",@"410",@"285"],@"true"];
+    [points addObject:point];
+    return points.copy;
+}
+
 
 @end

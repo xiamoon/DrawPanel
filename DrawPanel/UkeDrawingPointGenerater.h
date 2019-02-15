@@ -29,6 +29,9 @@ NS_ASSUME_NONNULL_BEGIN
 // 文字
 + (NSArray<NSArray *> *)textWholePoints;
 
+// 箭头
++ (NSArray<NSArray *> *)lineArrowWholePoints;
+
 @end
 
 NS_ASSUME_NONNULL_END
