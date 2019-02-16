@@ -9,6 +9,11 @@
 #import "UkeDrawingPointParser.h"
 #import "UkeDrawingPointGenerater.h"
 
+@interface UkeDrawingPointParser ()
+@property (nonatomic, copy, nullable) __block NSString *currentActionId;
+@property (nonatomic, copy, nullable) __block NSString *currentDrawType;
+@end
+
 @implementation UkeDrawingPointParser
 
 - (void)parseWithPoints:(NSArray<NSArray *> *)points
@@ -33,6 +38,23 @@
         }
         
         if (singlePoint.count <= 3) { // 中间点数据
+            // 如果当前actionId不等于该点actionId，则强制结束前一个路径
+            if (![self.currentActionId isEqualToString:action]) {
+                // 强制结束上一个路径
+                self.forceEndLastPath = YES;
+                __weak typeof(self)weakSelf = self;
+                if (completionHandler) {
+                    completionHandler(weakSelf);
+                }
+                self.forceEndLastPath = NO;
+                self.currentActionId = nil;
+                self.currentDrawType = nil;
+            }
+            
+            if (!self.currentDrawType) {
+                return;
+            }
+            
             if (singlePoint.count >= 2) {
                 NSValue *point = [NSValue valueWithCGPoint:CGPointMake([singlePoint[0] floatValue]*self.scaleX, [singlePoint[1] floatValue]*self.scaleY)];
                 [drawingPoints addObject:point];
@@ -40,6 +62,21 @@
         }else {
             drawType = singlePoint[3];
             if ([kUkeDrawingAllTypes containsObject:drawType]) { // 起始点数据
+                if (self.currentDrawType || self.currentActionId) { // 表示上一个点还没结束就来了下一个起始点
+                    // 强制结束上一个路径
+                    self.forceEndLastPath = YES;
+                    __weak typeof(self)weakSelf = self;
+                    if (completionHandler) {
+                        completionHandler(weakSelf);
+                    }
+                    self.forceEndLastPath = NO;
+                    self.currentActionId = nil;
+                    self.currentDrawType = nil;
+                }
+                
+                self.currentDrawType = drawType;
+                self.currentActionId = action;
+
                 NSValue *point = [NSValue valueWithCGPoint:CGPointMake([singlePoint[0] floatValue]*self.scaleX, [singlePoint[1] floatValue]*self.scaleY)];
                 startPoint = point;
                 
@@ -50,6 +87,10 @@
                 if (singlePoint.count >= 6) {
                     terminalFlag = singlePoint[5];
                     if (terminalFlag.boolValue == YES) { // 终止点数据
+                        if (!self.currentDrawType) {
+                            return;
+                        }
+                        
                         if ([drawType isEqualToString:kUkeDrawingAllTypes[8]]) { // 三角形
                             // 三角形的剩下两个点在drawInfo里面
                             if (drawInfo.count >= 6) {
@@ -73,6 +114,9 @@
                             NSValue *point = [NSValue valueWithCGPoint:CGPointMake([singlePoint[0] floatValue]*self.scaleX, [singlePoint[1] floatValue]*self.scaleY)];
                             [drawingPoints addObject:point];
                         }
+                        
+                        self.currentActionId = nil;
+                        self.currentDrawType = nil;
                     }else {
                         terminalFlag = nil;
                     }
@@ -81,8 +125,28 @@
                 drawType = nil;
                 terminalFlag = singlePoint[3];
                 if (terminalFlag.boolValue == YES) { // 终止点数据
+                    // 如果当前actionId不等于该点actionId，则强制结束前一个路径
+                    if (![self.currentActionId isEqualToString:action]) {
+                        // 强制结束上一个路径
+                        self.forceEndLastPath = YES;
+                        __weak typeof(self)weakSelf = self;
+                        if (completionHandler) {
+                            completionHandler(weakSelf);
+                        }
+                        self.forceEndLastPath = NO;
+                        self.currentActionId = nil;
+                        self.currentDrawType = nil;
+                    }
+                    
+                    if (!self.currentDrawType) {
+                        return;
+                    }
+                    
                     NSValue *point = [NSValue valueWithCGPoint:CGPointMake([singlePoint[0] floatValue]*self.scaleX, [singlePoint[1] floatValue]*self.scaleY)];
                     [drawingPoints addObject:point];
+                    
+                    self.currentActionId = nil;
+                    self.currentDrawType = nil;
                 }else {
                     terminalFlag = nil;
                 }
@@ -133,6 +197,7 @@
 }
 
 - (void)clearUpInfo {
+    self.forceEndLastPath = NO;
     self.action = nil;
     self.drawingMode = UkeDrawingModeUnKnown;
     self.startPoint = nil;
