@@ -49,7 +49,7 @@
                 
                 if (singlePoint.count >= 6) {
                     terminalFlag = singlePoint[5];
-                    if ([terminalFlag isEqualToString:@"true"]) { // 终止点数据
+                    if (terminalFlag.boolValue == YES) { // 终止点数据
                         if ([drawType isEqualToString:kUkeDrawingAllTypes[8]]) { // 三角形
                             // 三角形的剩下两个点在drawInfo里面
                             if (drawInfo.count >= 6) {
@@ -80,7 +80,7 @@
             }else {
                 drawType = nil;
                 terminalFlag = singlePoint[3];
-                if ([terminalFlag isEqualToString:@"true"]) { // 终止点数据
+                if (terminalFlag.boolValue == YES) { // 终止点数据
                     NSValue *point = [NSValue valueWithCGPoint:CGPointMake([singlePoint[0] floatValue]*self.scaleX, [singlePoint[1] floatValue]*self.scaleY)];
                     [drawingPoints addObject:point];
                 }else {
