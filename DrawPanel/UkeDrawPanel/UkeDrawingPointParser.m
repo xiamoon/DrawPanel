@@ -41,14 +41,7 @@
             // 如果当前actionId不等于该点actionId，则强制结束前一个路径
             if (![self.currentActionId isEqualToString:action]) {
                 // 强制结束上一个路径
-                self.forceEndLastPath = YES;
-                __weak typeof(self)weakSelf = self;
-                if (completionHandler) {
-                    completionHandler(weakSelf);
-                }
-                self.forceEndLastPath = NO;
-                self.currentActionId = nil;
-                self.currentDrawType = nil;
+                [self forceTerminateOnePathWithStartPoint:startPoint drawingPoints:drawingPoints completion:completionHandler];
             }
             
             if (!self.currentDrawType) {
@@ -64,14 +57,7 @@
             if ([kUkeDrawingAllTypes containsObject:drawType]) { // 起始点数据
                 if (self.currentDrawType || self.currentActionId) { // 表示上一个点还没结束就来了下一个起始点
                     // 强制结束上一个路径
-                    self.forceEndLastPath = YES;
-                    __weak typeof(self)weakSelf = self;
-                    if (completionHandler) {
-                        completionHandler(weakSelf);
-                    }
-                    self.forceEndLastPath = NO;
-                    self.currentActionId = nil;
-                    self.currentDrawType = nil;
+                    [self forceTerminateOnePathWithStartPoint:startPoint drawingPoints:drawingPoints completion:completionHandler];
                 }
                 
                 self.currentDrawType = drawType;
@@ -115,10 +101,8 @@
                             [drawingPoints addObject:point];
                         }
                         
-                        self.currentActionId = nil;
-                        self.currentDrawType = nil;
-                    }else {
-                        terminalFlag = nil;
+                        // 结束当前路径
+                        [self outputPathDataWithDrawingState:UkeDrawingStateEnd drawInfo:drawInfo drawType:drawType startPoint:startPoint drawingPoints:drawingPoints text:text completion:completionHandler];
                     }
                 }
             }else {
@@ -128,14 +112,7 @@
                     // 如果当前actionId不等于该点actionId，则强制结束前一个路径
                     if (![self.currentActionId isEqualToString:action]) {
                         // 强制结束上一个路径
-                        self.forceEndLastPath = YES;
-                        __weak typeof(self)weakSelf = self;
-                        if (completionHandler) {
-                            completionHandler(weakSelf);
-                        }
-                        self.forceEndLastPath = NO;
-                        self.currentActionId = nil;
-                        self.currentDrawType = nil;
+                        [self forceTerminateOnePathWithStartPoint:startPoint drawingPoints:drawingPoints completion:completionHandler];
                     }
                     
                     if (!self.currentDrawType) {
@@ -145,16 +122,31 @@
                     NSValue *point = [NSValue valueWithCGPoint:CGPointMake([singlePoint[0] floatValue]*self.scaleX, [singlePoint[1] floatValue]*self.scaleY)];
                     [drawingPoints addObject:point];
                     
-                    self.currentActionId = nil;
-                    self.currentDrawType = nil;
-                }else {
-                    terminalFlag = nil;
+                    // 结束当前路径
+                    [self outputPathDataWithDrawingState:UkeDrawingStateEnd drawInfo:drawInfo drawType:drawType startPoint:startPoint drawingPoints:drawingPoints text:text completion:completionHandler];
                 }
             }
         }
     }];
     
     
+    // 开始绘画第一个点 或 绘画中
+    if (startPoint || drawingPoints.count) {
+        UkeDrawingState drawingState = UkeDrawingStateDrawing;
+        if (startPoint && drawingPoints.count == 0) {
+            drawingState = UkeDrawingStateStart;
+        }
+        [self outputPathDataWithDrawingState:drawingState drawInfo:drawInfo drawType:drawType startPoint:startPoint drawingPoints:drawingPoints text:text completion:completionHandler];
+    }
+}
+
+- (void)outputPathDataWithDrawingState:(UkeDrawingState)drawingState
+                               drawInfo:(NSArray *)drawInfo
+                            drawType:(NSString *)drawType
+                         startPoint:(NSValue *)startPoint
+               drawingPoints:(NSMutableArray<NSValue *> *)drawingPoints
+                                text:(NSString *)text
+                         completion:(void(^)(UkeDrawingPointParser *parser))completionHandler {
     CGFloat width = 0;
     UIColor *color = nil;
     if (drawInfo) {
@@ -181,24 +173,47 @@
         drawingMode = (UkeDrawingMode)[kUkeDrawingAllTypes indexOfObject:drawType];
     }
     
-    self.action = action;
     self.drawingMode = drawingMode;
     self.startPoint = startPoint;
-    self.drawingPoints = drawingPoints;
+    self.drawingPoints = drawingPoints.copy;
     self.lineWidth = width;
     self.color = color;
     self.text = text;
-    self.drawingState = terminalFlag?UkeDrawingStateEnd:UkeDrawingStateDrawing;
+    self.drawingState = drawingState;
     
     __weak typeof(self)weakSelf = self;
     if (completionHandler) {
         completionHandler(weakSelf);
     }
+    
+    if (drawingState == UkeDrawingStateEnd) {
+        startPoint = nil;
+        drawingPoints = [NSMutableArray array];
+        self.currentActionId = nil;
+        self.currentDrawType = nil;
+    }
+}
+
+- (void)forceTerminateOnePathWithStartPoint:(NSValue *)startPoint
+                              drawingPoints:(NSMutableArray<NSValue *> *)drawingPoints
+                                 completion:(void(^)(UkeDrawingPointParser *parser))completionHandler {
+    [self clearUpInfo];
+    
+    self.forceEndLastPath = YES;
+    __weak typeof(self)weakSelf = self;
+    if (completionHandler) {
+        completionHandler(weakSelf);
+    }
+
+    startPoint = nil;
+    drawingPoints = [NSMutableArray array];
+    self.currentActionId = nil;
+    self.currentDrawType = nil;
+    self.forceEndLastPath = NO;
 }
 
 - (void)clearUpInfo {
     self.forceEndLastPath = NO;
-    self.action = nil;
     self.drawingMode = UkeDrawingModeUnKnown;
     self.startPoint = nil;
     self.drawingPoints = nil;

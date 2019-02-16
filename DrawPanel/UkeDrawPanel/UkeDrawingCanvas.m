@@ -61,10 +61,10 @@
 - (void)drawWithPoints:(NSArray<NSArray *> *)points {
     __weak typeof(self)weakSelf = self;
     [_pointParser parseWithPoints:points completion:^(UkeDrawingPointParser * _Nonnull parser) {
-        if (parser.drawingMode == UkeDrawingModeText) {
+        if (parser.drawingMode == UkeDrawingModeText) { // 文字
             [weakSelf.paintingView drawTextWithText:parser.text startPoint:parser.startPoint fontSize:parser.lineWidth color:parser.color drawingState:parser.drawingState];
         }else {
-            [weakSelf.paintingView drawWithMode:parser.drawingMode startPoint:parser.startPoint otherPoints:parser.drawingPoints width:parser.lineWidth color:parser.color drawingState:parser.drawingState];
+            [weakSelf.paintingView drawWithMode:parser.drawingMode startPoint:parser.startPoint otherPoints:parser.drawingPoints width:parser.lineWidth color:parser.color drawingState:parser.drawingState forceEnd:parser.forceEndLastPath];
         }
     }];
 }

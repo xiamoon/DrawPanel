@@ -14,7 +14,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface UkeDrawingPointParser : NSObject
 
-@property (nonatomic, copy, nullable) NSString *action;
 @property (nonatomic, assign) UkeDrawingMode drawingMode;
 @property (nonatomic, assign) UkeDrawingState drawingState;
 @property (nonatomic, assign) CGFloat lineWidth;

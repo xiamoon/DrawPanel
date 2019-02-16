@@ -29,14 +29,15 @@ NS_ASSUME_NONNULL_BEGIN
                otherPoints:(NSArray<NSValue *> *)points
                      width:(CGFloat)width
                      color:(UIColor *)color
-              drawingState:(UkeDrawingState)state;
+              drawingState:(UkeDrawingState)state
+            forceEnd:(BOOL)forceEnd;
 
 // 画文字
 - (void)drawTextWithText:(NSString *)text
               startPoint:(NSValue *)startPoint
                          fontSize:(CGFloat)fontSize
                          color:(UIColor *)color
-                  drawingState:(UkeDrawingState)state;
+            drawingState:(UkeDrawingState)state;
 
 @end
 

@@ -7,15 +7,12 @@
 //
 
 #import "UkePaintingView.h"
-#import "UkePathInfo.h"
 
 @interface UkePaintingView ()
 @property (nonatomic, assign) UkeDrawingMode currentDrawingMode;
 @property (nonatomic, assign) CGPoint startPoint;
 @property (nonatomic, strong) UIBezierPath *currentPath;
-@property (nonatomic, strong) UkePathInfo *currentPathInfo;
 @property (nonatomic, strong) CAShapeLayer *currentLayer;
-@property (nonatomic, strong) NSMutableArray<UkePathInfo *> *paths;
 @end
 
 @implementation UkePaintingView
@@ -24,7 +21,6 @@
     self = [super init];
     if (self) {
         self.backgroundColor = [UIColor clearColor];
-        _paths = [NSMutableArray array];
     }
     return self;
 }
@@ -69,13 +65,8 @@ static double degreeFromRadian(double radian) {
             UIBezierPath *path = [UIBezierPath bezierPath];
             [path moveToPoint:startPoint];
             
-            UkePathInfo *pathInfo = [[UkePathInfo alloc] init];
-            pathInfo.path = path;
-            pathInfo.blendMode = kCGBlendModeNormal;
-            
             _currentLayer = layer;
             _currentPath = path;
-            [_paths addObject:pathInfo];
         }else {
             [_currentPath addLineToPoint:currentPoint];
             _currentLayer.path = _currentPath.CGPath;
@@ -96,11 +87,7 @@ static double degreeFromRadian(double radian) {
             
             _currentLayer = layer;
         }else if (drawingState == UkeDrawingStateEnd) {
-            UkePathInfo *pathInfo = [[UkePathInfo alloc] init];
-            pathInfo.path = _currentPath;
-            pathInfo.blendMode = kCGBlendModeNormal;
-            
-            [_paths addObject:pathInfo];
+
         }
         
         _currentLayer.path = _currentPath.CGPath;
@@ -118,11 +105,7 @@ static double degreeFromRadian(double radian) {
             
             _currentLayer = layer;
         }else if (drawingState == UkeDrawingStateEnd) {
-            UkePathInfo *pathInfo = [[UkePathInfo alloc] init];
-            pathInfo.path = _currentPath;
-            pathInfo.blendMode = kCGBlendModeNormal;
-            
-            [_paths addObject:pathInfo];
+
         }
         
         _currentLayer.path = _currentPath.CGPath;
@@ -140,11 +123,7 @@ static double degreeFromRadian(double radian) {
             
             _currentLayer = layer;
         }else if (drawingState == UkeDrawingStateEnd) {
-            UkePathInfo *pathInfo = [[UkePathInfo alloc] init];
-            pathInfo.path = _currentPath;
-            pathInfo.blendMode = kCGBlendModeNormal;
-            
-            [_paths addObject:pathInfo];
+
         }
         
         _currentLayer.path = _currentPath.CGPath;
@@ -153,12 +132,7 @@ static double degreeFromRadian(double radian) {
             UIBezierPath *erasePath = [UIBezierPath bezierPath];
             [erasePath moveToPoint:startPoint];
             
-            UkePathInfo *pathInfo = [[UkePathInfo alloc] init];
-            pathInfo.path = erasePath;
-            pathInfo.blendMode = kCGBlendModeClear;
-            
             _currentPath = erasePath;
-            [_paths addObject:pathInfo];
         }else {
             [_currentPath addLineToPoint:currentPoint];
             
@@ -207,12 +181,7 @@ static double degreeFromRadian(double radian) {
             UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
             self.layer.contents = (id)image.CGImage;
             UIGraphicsEndImageContext();
-            
-            UkePathInfo *pathInfo = [[UkePathInfo alloc] init];
-            pathInfo.path = _currentPath;
-            pathInfo.blendMode = kCGBlendModeClear;
-            
-            [_paths addObject:pathInfo];
+
         }
         _currentLayer.path = _currentPath.CGPath;
     }else if (drawingMode == UkeDrawingModeLineArrow) { // 画箭头
@@ -312,11 +281,7 @@ static double degreeFromRadian(double radian) {
             
             _currentLayer = layer;
         }else if (drawingState == UkeDrawingStateEnd) {
-            UkePathInfo *pathInfo = [[UkePathInfo alloc] init];
-            pathInfo.path = _currentPath;
-            pathInfo.blendMode = kCGBlendModeNormal;
-            
-            [_paths addObject:pathInfo];
+
         }
         
         _currentLayer.path = _currentPath.CGPath;
@@ -368,11 +333,7 @@ static double degreeFromRadian(double radian) {
             
             _currentLayer = layer;
         }else if (drawingState == UkeDrawingStateEnd) {
-            UkePathInfo *pathInfo = [[UkePathInfo alloc] init];
-            pathInfo.path = _currentPath;
-            pathInfo.blendMode = kCGBlendModeNormal;
-            
-            [_paths addObject:pathInfo];
+
         }
         
         _currentLayer.path = _currentPath.CGPath;
@@ -385,13 +346,16 @@ static double degreeFromRadian(double radian) {
          otherPoints:(NSArray<NSValue *> *)points
                width:(CGFloat)width
                color:(UIColor *)color
-        drawingState:(UkeDrawingState)state {
-    if (drawingMode != UkeDrawingModeUnKnown) {
-        _currentDrawingMode = drawingMode;
+        drawingState:(UkeDrawingState)state
+            forceEnd:(BOOL)forceEnd {
+    
+    if (forceEnd) {
+        _currentLayer = nil;
+        _currentPath = nil;
     }
     
-    if (startPoint && points.count == 0) {
-        state = UkeDrawingStateStart;
+    if (drawingMode != UkeDrawingModeUnKnown) {
+        _currentDrawingMode = drawingMode;
     }
     
     if (startPoint) {
