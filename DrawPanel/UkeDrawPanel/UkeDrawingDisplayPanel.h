@@ -8,7 +8,6 @@
 
 #import <UIKit/UIKit.h>
 #import "UkeDrawingConstants.h"
-#import "UkeDrawingCanvas.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -19,8 +18,18 @@ NS_ASSUME_NONNULL_BEGIN
 // 翻到上一页
 - (void)turnToPreviousPage;
 
-//! 当前画布。每一页都对应一个单独的画布
-@property (nonatomic, strong) UkeDrawingCanvas *currentDrawingCanvas;
+
+#pragma mark - 数据点驱动绘画
+//! 服务器数据点驱动绘画
+- (void)drawWithPoints:(NSArray<NSArray *> *)points;
+
+
+#pragma mark - 手势驱动绘画
+//! 手绘时调用这个方法
+- (void)drawWithStartPoint:(CGPoint)startPoint
+              currentPoint:(CGPoint)currentPoint
+              drawingState:(UkeDrawingState)drawingState
+               drawingMode:(UkeDrawingMode)drawingMode;
 
 @end
 

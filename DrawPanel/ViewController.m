@@ -84,37 +84,37 @@
 #pragma mark - 服务器数据驱动绘画
 - (void)drawingByServer {
     // 画笔
-    [_panel.currentDrawingCanvas drawWithPoints:[UkeDrawingPointGenerater startPoints:UkeDrawingModeBrush]];
-    [_panel.currentDrawingCanvas drawWithPoints:[UkeDrawingPointGenerater points2]];
-    [_panel.currentDrawingCanvas drawWithPoints:[UkeDrawingPointGenerater points3]];
-    [_panel.currentDrawingCanvas drawWithPoints:[UkeDrawingPointGenerater points4]];
-    [_panel.currentDrawingCanvas drawWithPoints:[UkeDrawingPointGenerater endPoints]];
+    [_panel drawWithPoints:[UkeDrawingPointGenerater startPoints:UkeDrawingModeBrush]];
+    [_panel drawWithPoints:[UkeDrawingPointGenerater points2]];
+    [_panel drawWithPoints:[UkeDrawingPointGenerater points3]];
+    [_panel drawWithPoints:[UkeDrawingPointGenerater points4]];
+    [_panel drawWithPoints:[UkeDrawingPointGenerater endPoints]];
     // 三角形
-    [_panel.currentDrawingCanvas drawWithPoints:[UkeDrawingPointGenerater triangleWholePoints]];
+    [_panel drawWithPoints:[UkeDrawingPointGenerater triangleWholePoints]];
     // 文字
-    [_panel.currentDrawingCanvas drawWithPoints:[UkeDrawingPointGenerater textWholePoints]];
+    [_panel drawWithPoints:[UkeDrawingPointGenerater textWholePoints]];
     // 箭头
-    [_panel.currentDrawingCanvas drawWithPoints:[UkeDrawingPointGenerater lineArrowWholePoints]];
+    [_panel drawWithPoints:[UkeDrawingPointGenerater lineArrowWholePoints]];
 
-//    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-//        [self.panel.currentDrawingCanvas drawWithPoints:[UkeDrawingPointGenerater startPoints:UkeDrawingModeStar]];
-//    });
-//
-//    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-//        [self.panel.currentDrawingCanvas drawWithPoints:[UkeDrawingPointGenerater points2]];
-//    });
-//
-//    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-//        [self.panel.currentDrawingCanvas drawWithPoints:[UkeDrawingPointGenerater points3]];
-//    });
-//
-//    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-//        [self.panel.currentDrawingCanvas drawWithPoints:[UkeDrawingPointGenerater points4]];
-//    });
-//
-//    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(4.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-//        [self.panel.currentDrawingCanvas drawWithPoints:[UkeDrawingPointGenerater endPoints]];
-//    });
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [self.panel drawWithPoints:[UkeDrawingPointGenerater startPoints:UkeDrawingModeStar]];
+    });
+
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [self.panel drawWithPoints:[UkeDrawingPointGenerater points2]];
+    });
+
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [self.panel drawWithPoints:[UkeDrawingPointGenerater points3]];
+    });
+
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [self.panel drawWithPoints:[UkeDrawingPointGenerater points4]];
+    });
+
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(4.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [self.panel drawWithPoints:[UkeDrawingPointGenerater endPoints]];
+    });
 }
 
 #pragma mark - 手势驱动绘画
@@ -129,7 +129,7 @@
     _panDrawingMode = UkeDrawingModeEraserRectangle;
     
     UkeDrawingState drawingState = [self drawingStateFromGestureState:pan.state];
-    [_panel.currentDrawingCanvas drawWithStartPoint:_panStartPoint currentPoint:currentPoint drawingState:drawingState drawingMode:_panDrawingMode];
+    [_panel drawWithStartPoint:_panStartPoint currentPoint:currentPoint drawingState:drawingState drawingMode:_panDrawingMode];
 }
 
 - (UkeDrawingState)drawingStateFromGestureState:(UIGestureRecognizerState)state {

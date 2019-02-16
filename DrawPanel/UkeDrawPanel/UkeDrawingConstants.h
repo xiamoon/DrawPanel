@@ -44,6 +44,7 @@ typedef NS_ENUM(NSInteger, UkeDrawingMode) {
     UkeDrawingModeStar, //! 五角星
 };
 
+//TODO: 优化为Options
 typedef NS_ENUM(NSInteger, UkeDrawingState) {
     UkeDrawingStateUnknown = -1,
     UkeDrawingStateStart = 0,

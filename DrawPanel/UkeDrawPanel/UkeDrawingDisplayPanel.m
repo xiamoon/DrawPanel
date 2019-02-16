@@ -7,8 +7,10 @@
 //
 
 #import "UkeDrawingDisplayPanel.h"
+#import "UkeDrawingCanvas.h"
 
 @interface UkeDrawingDisplayPanel ()
+//! 当前画布。每一页都对应一个单独的画布
 @property (nonatomic, strong) UkeDrawingCanvas *currentCanvas;
 //! 所有的绘画内容
 @property (nonatomic, strong) NSMutableArray<UIImage *> *allCanvas;
@@ -100,8 +102,12 @@
     [_currentCanvas setCurrentContents:cachedDrawedContents];
 }
 
-- (UkeDrawingCanvas *)currentDrawingCanvas {
-    return _currentCanvas;
+- (void)drawWithPoints:(NSArray<NSArray *> *)points {
+    [_currentCanvas drawWithPoints:points];
+}
+
+- (void)drawWithStartPoint:(CGPoint)startPoint currentPoint:(CGPoint)currentPoint drawingState:(UkeDrawingState)drawingState drawingMode:(UkeDrawingMode)drawingMode {
+    [_currentCanvas drawWithStartPoint:startPoint currentPoint:currentPoint drawingState:drawingState drawingMode:drawingMode];
 }
 
 - (UkeDrawingCanvas *)createCanvas {

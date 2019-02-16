@@ -102,14 +102,14 @@
 		547001F52217F7FE00B58EBE /* UkeDrawPanel */ = {
 			isa = PBXGroup;
 			children = (
-				547001F62217F7FE00B58EBE /* UkeDrawingCanvas.m */,
 				547001F72217F7FE00B58EBE /* UkeDrawingConstants.h */,
+				547001FD2217F7FE00B58EBE /* UkeDrawingDisplayPanel.h */,
 				547001F82217F7FE00B58EBE /* UkeDrawingDisplayPanel.m */,
+				547001FB2217F7FE00B58EBE /* UkeDrawingCanvas.h */,
+				547001F62217F7FE00B58EBE /* UkeDrawingCanvas.m */,
+				547001FC2217F7FE00B58EBE /* UkePaintingView.h */,
 				547001F92217F7FE00B58EBE /* UkePaintingView.m */,
 				547001FA2217F7FE00B58EBE /* UkeDrawingPointParser.h */,
-				547001FB2217F7FE00B58EBE /* UkeDrawingCanvas.h */,
-				547001FC2217F7FE00B58EBE /* UkePaintingView.h */,
-				547001FD2217F7FE00B58EBE /* UkeDrawingDisplayPanel.h */,
 				547001FE2217F7FE00B58EBE /* UkeDrawingPointParser.m */,
 			);
 			path = UkeDrawPanel;
