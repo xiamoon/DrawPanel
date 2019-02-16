@@ -7,7 +7,6 @@
 //
 
 #import "UkeDrawingPointParser.h"
-#import "UkeDrawingPointGenerater.h"
 
 @interface UkeDrawingPointParser ()
 @property (nonatomic, copy, nullable) __block NSString *currentActionId;
