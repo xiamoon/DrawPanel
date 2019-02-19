@@ -32,6 +32,11 @@ NS_ASSUME_NONNULL_BEGIN
 // 箭头
 + (NSArray<NSArray *> *)lineArrowWholePoints;
 
+
+
++ (NSArray<NSArray *> *)S1M1E1S2M2;
++ (NSArray<NSArray *> *)M2E2;
+
 @end
 
 NS_ASSUME_NONNULL_END

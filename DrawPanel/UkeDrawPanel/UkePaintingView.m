@@ -87,7 +87,7 @@ static double degreeFromRadian(double radian) {
             
             _currentLayer = layer;
         }else if (drawingState == UkeDrawingStateEnd) {
-
+            
         }
         
         _currentLayer.path = _currentPath.CGPath;
@@ -105,7 +105,7 @@ static double degreeFromRadian(double radian) {
             
             _currentLayer = layer;
         }else if (drawingState == UkeDrawingStateEnd) {
-
+            
         }
         
         _currentLayer.path = _currentPath.CGPath;
@@ -123,7 +123,7 @@ static double degreeFromRadian(double radian) {
             
             _currentLayer = layer;
         }else if (drawingState == UkeDrawingStateEnd) {
-
+            
         }
         
         _currentLayer.path = _currentPath.CGPath;
@@ -139,11 +139,11 @@ static double degreeFromRadian(double radian) {
             UIGraphicsBeginImageContextWithOptions(self.frame.size, NO, [UIScreen mainScreen].scale);
             CGContextRef context = UIGraphicsGetCurrentContext();
             [self.layer renderInContext:context];
-
+            
             while (self.layer.sublayers.count) {
                 [self.layer.sublayers.lastObject removeFromSuperlayer];
             }
-
+            
             CGContextSetLineWidth(context, 10);
             CGContextSetBlendMode(context, kCGBlendModeClear);
             CGContextAddPath(context, _currentPath.CGPath);
@@ -181,7 +181,7 @@ static double degreeFromRadian(double radian) {
             UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
             self.layer.contents = (id)image.CGImage;
             UIGraphicsEndImageContext();
-
+            
         }
         _currentLayer.path = _currentPath.CGPath;
     }else if (drawingMode == UkeDrawingModeLineArrow) { // 画箭头
@@ -281,7 +281,7 @@ static double degreeFromRadian(double radian) {
             
             _currentLayer = layer;
         }else if (drawingState == UkeDrawingStateEnd) {
-
+            
         }
         
         _currentLayer.path = _currentPath.CGPath;
@@ -319,7 +319,7 @@ static double degreeFromRadian(double radian) {
         [path addLineToPoint:E];
         [path addLineToPoint:J];
         [path addLineToPoint:A];
-
+        
         _currentPath = path;
         
         if (drawingState == UkeDrawingStateStart) {
@@ -333,7 +333,7 @@ static double degreeFromRadian(double radian) {
             
             _currentLayer = layer;
         }else if (drawingState == UkeDrawingStateEnd) {
-
+            
         }
         
         _currentLayer.path = _currentPath.CGPath;
@@ -349,30 +349,32 @@ static double degreeFromRadian(double radian) {
         drawingState:(UkeDrawingState)state
             forceEnd:(BOOL)forceEnd {
     
-    if (forceEnd) {
+    if (state&UkeDrawingStateStart) {
+        _currentDrawingMode = drawingMode;
+        _startPoint = startPoint.CGPointValue;
         _currentLayer = nil;
         _currentPath = nil;
     }
     
-    if (drawingMode != UkeDrawingModeUnKnown) {
-        _currentDrawingMode = drawingMode;
+    if (forceEnd) {
+        
     }
     
-    if (startPoint) {
-        _startPoint = startPoint.CGPointValue;
-    }
-    
-    if (!_currentLayer && _currentDrawingMode != UkeDrawingModeEraser) {
+    if ((state&UkeDrawingStateStart) && _currentDrawingMode != UkeDrawingModeEraser && !forceEnd) {
         [self createLayerWithWidth:width color:color isEraserRectangle:(_currentDrawingMode == UkeDrawingModeEraserRectangle)];
     }
     
+    NSLog(@"state->%ld", state);
+    
     if (_currentDrawingMode == UkeDrawingModeBrush) { // 线
-        if (!_currentPath) {
+        if (state&UkeDrawingStateStart) {
             _currentPath = [UIBezierPath bezierPath];
             [_currentPath moveToPoint:_startPoint];
+            NSLog(@"新路径，开始点：%@", NSStringFromCGPoint(_startPoint));
         }
         
         if (points.count) {
+            NSLog(@"points:%@", points);
             for (int i = 0; i < points.count; i ++) {
                 CGPoint currentPoint = [points[i] CGPointValue];
                 [_currentPath addLineToPoint:currentPoint];
@@ -411,7 +413,7 @@ static double degreeFromRadian(double radian) {
     }else if (_currentDrawingMode == UkeDrawingModeLineArrow) { // 箭头
         [self drawLineArrowWithStartPoint:_startPoint otherPoints:points width:width color:color];
     }else if (_currentDrawingMode == UkeDrawingModeEraser) { // 橡皮擦
-        if (!_currentPath) {
+        if (state&UkeDrawingStateStart) {
             _currentPath = [UIBezierPath bezierPath];
             [_currentPath moveToPoint:_startPoint];
         }
@@ -429,7 +431,7 @@ static double degreeFromRadian(double radian) {
                     [self.layer.sublayers.lastObject removeFromSuperlayer];
                 }
                 
-                CGContextSetLineWidth(context, 10);
+                CGContextSetLineWidth(context, width);
                 CGContextSetBlendMode(context, kCGBlendModeClear);
                 CGContextAddPath(context, _currentPath.CGPath);
                 CGContextDrawPath(context, kCGPathStroke);
@@ -438,6 +440,7 @@ static double degreeFromRadian(double radian) {
                 UIGraphicsEndImageContext();
             }
         }
+        _currentPath = nil;
     }else if (_currentDrawingMode == UkeDrawingModeEraserRectangle) { // 框选删除
         if (points.count) {
             for (int i = 0; i < points.count; i ++) {
@@ -446,7 +449,10 @@ static double degreeFromRadian(double radian) {
             }
         }
         
-        if (state == UkeDrawingStateEnd) {
+        if (state&UkeDrawingStateEnd || forceEnd) {
+            [_currentLayer removeFromSuperlayer];
+            _currentLayer = nil;
+            
             UIGraphicsBeginImageContextWithOptions(self.frame.size, NO, [UIScreen mainScreen].scale);
             CGContextRef context = UIGraphicsGetCurrentContext();
             [self.layer renderInContext:context];
@@ -455,7 +461,6 @@ static double degreeFromRadian(double radian) {
                 [self.layer.sublayers.lastObject removeFromSuperlayer];
             }
             
-            CGContextSetLineWidth(context, 1.0);
             CGContextSetBlendMode(context, kCGBlendModeClear);
             CGContextAddPath(context, _currentPath.CGPath);
             CGContextDrawPath(context, kCGPathFill);
@@ -466,11 +471,11 @@ static double degreeFromRadian(double radian) {
     }
     
     
-    if (_currentDrawingMode != UkeDrawingModeEraser) {
+    if (_currentDrawingMode != UkeDrawingModeEraser && _currentPath) {
         _currentLayer.path = _currentPath.CGPath;
     }
     
-    if (state == UkeDrawingStateEnd) {
+    if (state&UkeDrawingStateEnd || forceEnd) {
         _currentLayer = nil;
         _currentPath = nil;
     }
@@ -478,7 +483,7 @@ static double degreeFromRadian(double radian) {
 
 // 画五角星
 - (void)drawStarWithStartPoint:(CGPoint)startPoint
-                        otherPoints:(NSArray<NSValue *> *)points {
+                   otherPoints:(NSArray<NSValue *> *)points {
     // 设O为圆心，A（上顶点）、B、C、D、E为外点(顺时针方向)，F（右上角内点）、G、H、I、J为内点（顺时针方向）。每个外角为36度
     // 大圆圆心
     CGPoint O = startPoint;
@@ -523,9 +528,9 @@ static double degreeFromRadian(double radian) {
 
 // 画箭头
 - (void)drawLineArrowWithStartPoint:(CGPoint)startPoint
-                 otherPoints:(NSArray<NSValue *> *)points
-                       width:(CGFloat)width
-                       color:(UIColor *)color {
+                        otherPoints:(NSArray<NSValue *> *)points
+                              width:(CGFloat)width
+                              color:(UIColor *)color {
     if (points.count != 1) {
         return;
     }
@@ -606,7 +611,7 @@ static double degreeFromRadian(double radian) {
 // 画文字
 - (void)drawTextWithText:(NSString *)text
               startPoint:(NSValue *)startPoint
-                   fontSize:(CGFloat)fontSize
+                fontSize:(CGFloat)fontSize
                    color:(UIColor *)color
             drawingState:(UkeDrawingState)state {
     if (![text isKindOfClass:[NSString class]] || !text.length) {
@@ -628,12 +633,12 @@ static double degreeFromRadian(double radian) {
 }
 
 - (void)createLayerWithWidth:(CGFloat)width
-                                      color:(UIColor *)color
+                       color:(UIColor *)color
            isEraserRectangle:(BOOL)isEraserRectangle {
     CAShapeLayer *layer = [[CAShapeLayer alloc] init];
     layer.backgroundColor = [UIColor clearColor].CGColor;
     if (isEraserRectangle) {
-        layer.fillColor = [[UIColor redColor] colorWithAlphaComponent:0.5].CGColor;
+        layer.fillColor = [[UIColor greenColor] colorWithAlphaComponent:0.5].CGColor;
         layer.strokeColor = [UIColor clearColor].CGColor;
     }else {
         layer.fillColor = [UIColor clearColor].CGColor;
@@ -649,5 +654,5 @@ static double degreeFromRadian(double radian) {
 - (void)dealloc {
     NSLog(@"paintingView销毁");
 }
-    
+
 @end
