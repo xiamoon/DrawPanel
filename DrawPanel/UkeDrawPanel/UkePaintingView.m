@@ -356,11 +356,7 @@ static double degreeFromRadian(double radian) {
         _currentPath = nil;
     }
     
-    if (forceEnd) {
-        
-    }
-    
-    if ((state&UkeDrawingStateStart) && _currentDrawingMode != UkeDrawingModeEraser && !forceEnd) {
+    if ((state&UkeDrawingStateStart) && _currentDrawingMode != UkeDrawingModeEraser) {
         [self createLayerWithWidth:width color:color isEraserRectangle:(_currentDrawingMode == UkeDrawingModeEraserRectangle)];
     }
     

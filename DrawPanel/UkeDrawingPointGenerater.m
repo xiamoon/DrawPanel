@@ -191,6 +191,28 @@
     return points.copy;
 }
 
+
++ (NSArray<NSArray *> *)S1M1 {
+    NSMutableArray *points = [NSMutableArray array];
+    
+    [points addObject:@[@"100",@"160",@"11",@"brush",@[@"2",@"#EF4C4F"]]];
+    [points addObject:@[@"110",@"240",@"11"]];
+    
+    return points.copy;
+}
+
++ (NSArray<NSArray *> *)M1E1S2M2 {
+    NSMutableArray *points = [NSMutableArray array];
+    
+    [points addObject:@[@"120",@"200",@"11"]];
+    [points addObject:@[@"130",@"100",@"11",@"true"]];
+    
+    [points addObject:@[@"400",@"160",@"12",@"brush",@[@"2",@"#EF4C4F"]]];
+    [points addObject:@[@"410",@"240",@"12"]];
+    
+    return points.copy;
+}
+
 + (NSArray<NSArray *> *)M2E2 {
     NSMutableArray *points = [NSMutableArray array];
 

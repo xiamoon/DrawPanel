@@ -15,14 +15,15 @@ NS_ASSUME_NONNULL_BEGIN
 @interface UkeDrawingPointParser : NSObject
 
 @property (nonatomic, assign) UkeDrawingMode drawingMode;
-@property (nonatomic, assign) UkeDrawingState drawingState;
+@property (nonatomic, assign, readonly) __block UkeDrawingState currentDrawingState;
 @property (nonatomic, assign) CGFloat lineWidth;
 @property (nonatomic, strong, nullable) UIColor *color;
 
-@property (nonatomic, copy, nullable) NSString *text;
+@property (nonatomic, copy, nullable, readonly) NSString *currentText;
 
-@property (nonatomic, strong, nullable) NSValue *startPoint;
-@property (nonatomic, strong, nullable) NSArray<NSValue *> *drawingPoints; // 不包含起始点
+@property (nonatomic, strong, readonly) __block NSValue *currentStartPoint;
+// 同一笔数据点，可能是完整的，也可能不完整，不包含起始点
+@property (nonatomic, strong, readonly, nullable) __block NSMutableArray<NSValue *> *currentDrawPoints;
 
 // 是否强制结束。当第二笔数据过来时，如果前一笔还没结束，则强制结束第一笔路径
 @property (nonatomic, assign) __block BOOL forceEndLastPath;

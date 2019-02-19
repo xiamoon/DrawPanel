@@ -9,8 +9,13 @@
 #import "UkeDrawingPointParser.h"
 
 @interface UkeDrawingPointParser ()
+// 同一笔数据点，可能是完整的，也可能不完整
+@property (nonatomic, strong) __block NSMutableArray<NSValue *> *currentDrawPoints;
+@property (nonatomic, strong) __block NSValue *currentStartPoint;
 @property (nonatomic, copy, nullable) __block NSString *currentActionId;
 @property (nonatomic, copy, nullable) __block NSString *currentDrawType;
+@property (nonatomic, assign) __block UkeDrawingState currentDrawingState;
+@property (nonatomic, copy, nullable) __block NSString *currentText;
 @end
 
 @implementation UkeDrawingPointParser
@@ -20,6 +25,8 @@
     if (self) {
         _scaleX = 1.0;
         _scaleY = 1.0;
+        _currentDrawPoints = [NSMutableArray array];
+        _currentDrawingState = UkeDrawingStateUnknown;
     }
     return self;
 }
@@ -27,15 +34,10 @@
 - (void)parseWithPoints:(NSArray<NSArray *> *)points
              completion:(void(^)(UkeDrawingPointParser *parser))completionHandler {
     [self clearUpInfo];
-    __block NSMutableArray<NSValue *> *drawingPoints = [NSMutableArray array];
     
     __block NSString *action = nil;
-    __block NSString *drawType = nil;
     __block NSArray *drawInfo = nil; // 画笔信息，如粗细，颜色等
-    __block NSValue *startPoint = nil;
     __block NSString *terminalFlag = nil;
-    __block NSString *text = nil;
-    __block UkeDrawingState drawingState = UkeDrawingStateUnknown;
     
     [points enumerateObjectsUsingBlock:^(NSArray *singlePoint, NSUInteger index, BOOL * _Nonnull stop) {
         if (singlePoint.count < 2) {
@@ -46,14 +48,12 @@
             action = singlePoint[2];
         }
         
-        if (singlePoint.count <= 3) { // 中间点数据
+#pragma mark - 中间点数据
+        if (singlePoint.count <= 3) {
             // 如果当前actionId不等于该点actionId，则强制结束前一个路径
-            if (![self.currentActionId isEqualToString:action]) {
+            if (self.currentActionId && self.currentActionId.integerValue != action.integerValue) {
                 // 强制结束上一个路径
-                [self forceTerminateOnePathCompletion:completionHandler];
-                drawingState = UkeDrawingStateUnknown;
-                startPoint = nil;
-                drawingPoints = [NSMutableArray array];
+                [self outputPathDataWithDrawInfo:drawInfo isForceEnd:YES completion:completionHandler];
             }
             
             if (!self.currentDrawType) {
@@ -62,29 +62,29 @@
             
             if (singlePoint.count >= 2) {
                 NSValue *point = [NSValue valueWithCGPoint:CGPointMake([singlePoint[0] floatValue]*self.scaleX, [singlePoint[1] floatValue]*self.scaleY)];
-                [drawingPoints addObject:point];
-                drawingState = drawingState|UkeDrawingStateDrawing;
+                [self.currentDrawPoints addObject:point];
+                self.currentDrawingState = self.currentDrawingState|UkeDrawingStateDrawing;
             }
         }else if (singlePoint.count >= 5) {
-            drawType = singlePoint[3];
+            NSString *drawType = singlePoint[3];
             if ([drawType isKindOfClass:NSString.class]&&[drawType isEqualToString:@"publisherTime"]) {
                 return;
             }
-            if ([kUkeDrawingAllTypes containsObject:drawType]) { // 起始点数据
-                if (self.currentDrawType || self.currentActionId) { // 表示上一个点还没结束就来了下一个起始点
+#pragma mark - 起始点数据
+            if ([kUkeDrawingAllTypes containsObject:drawType]) {
+                // 表示上一个点还没结束就来了下一个起始点
+                if (self.currentActionId && self.currentActionId.integerValue != action.integerValue) {
                     // 强制结束上一个路径
-                    [self forceTerminateOnePathCompletion:completionHandler];
-                    drawingState = UkeDrawingStateUnknown;
-                    startPoint = nil;
-                    drawingPoints = [NSMutableArray array];
+                    [self outputPathDataWithDrawInfo:drawInfo isForceEnd:YES completion:completionHandler];
                 }
                 
                 self.currentDrawType = drawType;
                 self.currentActionId = action;
+                self.currentDrawingState = UkeDrawingStateUnknown;
                 
                 NSValue *point = [NSValue valueWithCGPoint:CGPointMake([singlePoint[0] floatValue]*self.scaleX, [singlePoint[1] floatValue]*self.scaleY)];
-                startPoint = point;
-                drawingState = drawingState|UkeDrawingStateStart;
+                self.currentStartPoint = point;
+                self.currentDrawingState = self.currentDrawingState|UkeDrawingStateStart;
                 
                 if (singlePoint.count >= 5) {
                     drawInfo = singlePoint[4];
@@ -95,41 +95,39 @@
                     if ([terminalFlag isKindOfClass:NSString.class]&&[terminalFlag isEqualToString:@"publisherTime"]) {
                         return;
                     }
+#pragma mark - 结束点数据
                     if (terminalFlag.boolValue == YES) { // 终止点数据
                         if (!self.currentDrawType) {
                             return;
                         }
                         
-                        if ([drawType isEqualToString:kUkeDrawingAllTypes[8]]) { // 三角形
+                        if ([self.currentDrawType isEqualToString:kUkeDrawingAllTypes[8]]) { // 三角形
                             // 三角形的剩下两个点在drawInfo里面
                             if (drawInfo.count >= 6) {
                                 NSValue *point1 = [NSValue valueWithCGPoint:CGPointMake([drawInfo[2] floatValue]*self.scaleX, [drawInfo[3] floatValue]*self.scaleY)];
                                 NSValue *point2 = [NSValue valueWithCGPoint:CGPointMake([drawInfo[4] floatValue]*self.scaleX, [drawInfo[5] floatValue]*self.scaleY)];
                                 
-                                [drawingPoints addObject:point1];
-                                [drawingPoints addObject:point2];
+                                [self.currentDrawPoints addObject:point1];
+                                [self.currentDrawPoints addObject:point2];
                             }
-                        } else if ([drawType isEqualToString:kUkeDrawingAllTypes[7]]) { // 箭头
+                        } else if ([self.currentDrawType isEqualToString:kUkeDrawingAllTypes[7]]) { // 箭头
                             // 箭头的终点在drawInfo里面
                             if (drawInfo.count >= 4) {
                                 NSValue *endPoint = [NSValue valueWithCGPoint:CGPointMake([drawInfo[2] floatValue]*self.scaleX, [drawInfo[3] floatValue]*self.scaleY)];
-                                [drawingPoints addObject:endPoint];
+                                [self.currentDrawPoints addObject:endPoint];
                             }
-                        } else if ([drawType isEqualToString:kUkeDrawingAllTypes[4]]) { // 文字
+                        } else if ([self.currentDrawType isEqualToString:kUkeDrawingAllTypes[4]]) { // 文字
                             if (singlePoint.count >= 7) {
-                                text = singlePoint[6];
+                                self.currentText = singlePoint[6];
                             }
                         } else {
                             NSValue *point = [NSValue valueWithCGPoint:CGPointMake([singlePoint[0] floatValue]*self.scaleX, [singlePoint[1] floatValue]*self.scaleY)];
-                            [drawingPoints addObject:point];
+                            [self.currentDrawPoints addObject:point];
                         }
                         
                         // 结束当前路径
-                        drawingState = drawingState | UkeDrawingStateEnd;
-                        [self outputPathDataWithDrawingState:drawingState drawInfo:drawInfo drawType:drawType startPoint:startPoint drawingPoints:drawingPoints text:text completion:completionHandler];
-                        drawingState = UkeDrawingStateUnknown;
-                        startPoint = nil;
-                        drawingPoints = [NSMutableArray array];
+                        self.currentDrawingState = self.currentDrawingState | UkeDrawingStateEnd;
+                        [self outputPathDataWithDrawInfo:drawInfo isForceEnd:NO completion:completionHandler];
                     }
                 }
             }
@@ -138,14 +136,12 @@
             if ([terminalFlag isKindOfClass:NSString.class]&&[terminalFlag isEqualToString:@"publisherTime"]) {
                 return;
             }
-            if (terminalFlag.boolValue == YES) { // 终止点数据
+#pragma mark - 结束点数据
+            if (terminalFlag.boolValue == YES) {
                 // 如果当前actionId不等于该点actionId，则强制结束前一个路径
-                if (![self.currentActionId isEqualToString:action]) {
+                if (self.currentActionId && self.currentActionId.integerValue != action.integerValue) {
                     // 强制结束上一个路径
-                    [self forceTerminateOnePathCompletion:completionHandler];
-                    drawingState = UkeDrawingStateUnknown;
-                    startPoint = nil;
-                    drawingPoints = [NSMutableArray array];
+                    [self outputPathDataWithDrawInfo:drawInfo isForceEnd:YES completion:completionHandler];
                 }
                 
                 if (!self.currentDrawType) {
@@ -153,31 +149,23 @@
                 }
                 
                 NSValue *point = [NSValue valueWithCGPoint:CGPointMake([singlePoint[0] floatValue]*self.scaleX, [singlePoint[1] floatValue]*self.scaleY)];
-                [drawingPoints addObject:point];
+                [self.currentDrawPoints addObject:point];
                 
                 // 结束当前路径
-                drawingState = drawingState | UkeDrawingStateEnd;
-                [self outputPathDataWithDrawingState:drawingState drawInfo:drawInfo drawType:drawType startPoint:startPoint drawingPoints:drawingPoints text:text completion:completionHandler];
-                drawingState = UkeDrawingStateUnknown;
-                startPoint = nil;
-                drawingPoints = [NSMutableArray array];
+                self.currentDrawingState = self.currentDrawingState | UkeDrawingStateEnd;
+                [self outputPathDataWithDrawInfo:drawInfo isForceEnd:NO completion:completionHandler];
             }
         }
     }];
     
     // 开始绘画第一个点 或 绘画中
-    if (drawingState > UkeDrawingStateUnknown) {
-        [self outputPathDataWithDrawingState:drawingState drawInfo:drawInfo drawType:drawType startPoint:startPoint drawingPoints:drawingPoints text:text completion:completionHandler];
-        drawingState = UkeDrawingStateUnknown;
+    if (self.currentDrawingState > UkeDrawingStateUnknown) {
+        [self outputPathDataWithDrawInfo:drawInfo isForceEnd:NO completion:completionHandler];
     }
 }
 
-- (void)outputPathDataWithDrawingState:(UkeDrawingState)drawingState
-                              drawInfo:(NSArray *)drawInfo
-                              drawType:(NSString *)drawType
-                            startPoint:(NSValue *)startPoint
-                         drawingPoints:(NSMutableArray<NSValue *> *)drawingPoints
-                                  text:(NSString *)text
+- (void)outputPathDataWithDrawInfo:(NSArray *)drawInfo
+                        isForceEnd:(BOOL)isForcedEnd
                             completion:(void(^)(UkeDrawingPointParser *parser))completionHandler {
     CGFloat width = 0;
     UIColor *color = nil;
@@ -188,8 +176,8 @@
         
         if (drawInfo.count >= 2) {
             NSString *hex = drawInfo[1];
-            if ([drawType isEqualToString:kUkeDrawingAllTypes[2]] || // 圆
-                [drawType isEqualToString:kUkeDrawingAllTypes[3]]) { // 框
+            if ([self.currentDrawType isEqualToString:kUkeDrawingAllTypes[2]] || // 圆
+                [self.currentDrawType isEqualToString:kUkeDrawingAllTypes[3]]) { // 框
                 if (drawInfo.count >= 3) {
                     hex = drawInfo[2];
                 }
@@ -201,50 +189,41 @@
     }
     
     UkeDrawingMode drawingMode = UkeDrawingModeUnKnown;
-    if (drawType) {
-        drawingMode = (UkeDrawingMode)[kUkeDrawingAllTypes indexOfObject:drawType];
+    if (self.currentDrawType) {
+        drawingMode = (UkeDrawingMode)[kUkeDrawingAllTypes indexOfObject:self.currentDrawType];
     }
     
     self.drawingMode = drawingMode;
-    self.startPoint = startPoint;
-    self.drawingPoints = drawingPoints.copy;
     self.lineWidth = width;
     self.color = color;
-    self.text = text;
-    self.drawingState = drawingState;
+    
+    if (isForcedEnd) {
+        self.forceEndLastPath = YES;
+    }
     
     __weak typeof(self)weakSelf = self;
     if (completionHandler) {
         completionHandler(weakSelf);
     }
     
-    if (drawingState & UkeDrawingStateEnd) {
+    self.currentDrawingState = UkeDrawingStateUnknown;
+    self.currentDrawPoints = [NSMutableArray array];
+    self.forceEndLastPath = NO;
+
+    if (self.currentDrawingState&UkeDrawingStateEnd) {
         self.currentActionId = nil;
         self.currentDrawType = nil;
+        self.currentStartPoint = nil;
     }
-}
-
-- (void)forceTerminateOnePathCompletion:(void(^)(UkeDrawingPointParser *parser))completionHandler {
-    [self clearUpInfo];
-    self.startPoint = nil;
-    self.forceEndLastPath = YES;
-    __weak typeof(self)weakSelf = self;
-    if (completionHandler) {
-        completionHandler(weakSelf);
-    }
-    self.currentActionId = nil;
-    self.currentDrawType = nil;
-    self.forceEndLastPath = NO;
 }
 
 - (void)clearUpInfo {
     self.forceEndLastPath = NO;
-    self.drawingMode = UkeDrawingModeUnKnown;
-    self.startPoint = nil;
-    self.drawingPoints = nil;
+    self.currentDrawPoints = [NSMutableArray array];
     self.lineWidth = 0;
     self.color = nil;
-    self.drawingState = UkeDrawingStateUnknown;
+    self.currentDrawingState = UkeDrawingStateUnknown;
+    self.currentText = nil;
 }
 
 - (NSInteger)numberWithHexString:(NSString *)hexString{
