@@ -164,6 +164,7 @@
     }
 }
 
+// 输出数据点供绘图使用
 - (void)outputPathDataWithDrawInfo:(NSArray *)drawInfo
                         isForceEnd:(BOOL)isForcedEnd
                             completion:(void(^)(UkeDrawingPointParser *parser))completionHandler {
@@ -199,6 +200,16 @@
     
     if (isForcedEnd) {
         self.forceEndLastPath = YES;
+    }
+    
+    // 数据点优化，画线段、椭圆、矩形框、框选删除、箭头、三角形、五角星等不需要每个点都画，在同一个currentDrawPoints中，只需要取最后一个点即可。
+    if (self.currentDrawPoints.count>1) {
+        if (drawingMode == UkeDrawingModeBrush ||
+            drawingMode == UkeDrawingModeText ||
+            drawingMode == UkeDrawingModeEraser) {
+        }else {
+            self.currentDrawPoints = [NSMutableArray arrayWithObject:self.currentDrawPoints.lastObject];
+        }
     }
     
     __weak typeof(self)weakSelf = self;

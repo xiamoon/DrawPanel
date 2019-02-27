@@ -102,10 +102,16 @@
 //    [_panel drawWithPoints:[UkeDrawingPointGenerater endPoints]];
     
     
-    [_panel drawWithPoints:[UkeDrawingPointGenerater S1M1]];
-    [_panel drawWithPoints:[UkeDrawingPointGenerater M1E1S2M2]];
+    [_panel drawWithPoints:[UkeDrawingPointGenerater S1M1E1S2M2]];
     [_panel drawWithPoints:[UkeDrawingPointGenerater M2E2]];
 
+    [_panel drawWithPoints:[UkeDrawingPointGenerater eraser]];
+
+    
+    
+//    [_panel drawWithPoints:[UkeDrawingPointGenerater startPoints:UkeDrawingModeLine]];
+//    [_panel drawWithPoints:[UkeDrawingPointGenerater points2]];
+//    [_panel drawWithPoints:[UkeDrawingPointGenerater endPoints]];
 }
 
 #pragma mark - 手势驱动绘画

@@ -62,6 +62,8 @@
         start = @[@"90.83333333333334",@"100.83333333333334",@"14",@"eraserrectangle",@[]];
     }else if (mode == UkeDrawingModeStar) {
         start = @[@"252.5",@"130.83333333333334",@"14",@"star",@[@"2",@"#EF4C4F",@"0"]];
+    }else if (mode == UkeDrawingModeEraser) {
+        start = @[@"252.5",@"130.83333333333334",@"14",@"eraser",@[@(40)]];
     }
     
     NSArray *point1 = @[@"254.16666666666669",@"133.33333333333334",@"14"];
@@ -218,6 +220,18 @@
 
     [points addObject:@[@"420",@"200",@"12"]];
     [points addObject:@[@"430",@"100",@"12",@"true"]];
+    
+    return points.copy;
+}
+
++ (NSArray<NSArray *> *)eraser {
+    NSMutableArray *points = [NSMutableArray array];
+
+    NSArray *start = @[@"100",@"160",@"13",@"eraser",@[@(40)]];
+    [points addObject:start];
+    [points addObject:@[@"110",@"240",@"13"]];
+    [points addObject:@[@"120",@"200",@"13"]];
+    [points addObject:@[@"130",@"100",@"13",@"true"]];
     
     return points.copy;
 }

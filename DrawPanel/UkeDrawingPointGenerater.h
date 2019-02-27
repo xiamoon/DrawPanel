@@ -39,6 +39,8 @@ NS_ASSUME_NONNULL_BEGIN
 + (NSArray<NSArray *> *)M1E1S2M2;
 + (NSArray<NSArray *> *)M2E2;
 
++ (NSArray<NSArray *> *)eraser;
+
 @end
 
 NS_ASSUME_NONNULL_END

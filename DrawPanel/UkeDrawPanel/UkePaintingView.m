@@ -436,7 +436,7 @@ static double degreeFromRadian(double radian) {
                 UIGraphicsEndImageContext();
             }
         }
-        _currentPath = nil;
+//        _currentPath = nil;
     }else if (_currentDrawingMode == UkeDrawingModeEraserRectangle) { // 框选删除
         if (points.count) {
             for (int i = 0; i < points.count; i ++) {
@@ -614,6 +614,8 @@ static double degreeFromRadian(double radian) {
         return;
     }
     
+    CGFloat fontsize = fontSize*(72/96.0);
+    
     CGPoint point = startPoint.CGPointValue;
     
     CATextLayer *textLayer = [[CATextLayer alloc] init];
@@ -621,7 +623,7 @@ static double degreeFromRadian(double radian) {
     textLayer.backgroundColor = [UIColor clearColor].CGColor;
     NSMutableAttributedString *attri = [[NSMutableAttributedString alloc] initWithString:text];
     [attri addAttribute:NSForegroundColorAttributeName value:color range:NSMakeRange(0, text.length)];
-    [attri addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:fontSize weight:UIFontWeightSemibold] range:NSMakeRange(0, text.length)];
+    [attri addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:fontsize weight:UIFontWeightSemibold] range:NSMakeRange(0, text.length)];
     CGSize textSize = [attri boundingRectWithSize:self.bounds.size options:0 context:NULL].size;
     textLayer.frame = CGRectMake(point.x, point.y, textSize.width, textSize.height);
     textLayer.string = attri;
@@ -634,7 +636,7 @@ static double degreeFromRadian(double radian) {
     CAShapeLayer *layer = [[CAShapeLayer alloc] init];
     layer.backgroundColor = [UIColor clearColor].CGColor;
     if (isEraserRectangle) {
-        layer.fillColor = [[UIColor greenColor] colorWithAlphaComponent:0.5].CGColor;
+        layer.fillColor = [[UIColor redColor] colorWithAlphaComponent:0.4].CGColor;
         layer.strokeColor = [UIColor clearColor].CGColor;
     }else {
         layer.fillColor = [UIColor clearColor].CGColor;
